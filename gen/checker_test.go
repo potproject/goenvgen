@@ -1,4 +1,4 @@
-package main
+package gen
 
 import (
 	"reflect"
@@ -43,21 +43,21 @@ func Test_checker(t *testing.T) {
 			name:  "int64 test1",
 			text:  "0",
 			want:  reflect.Int64,
-			want1: 0,
+			want1: int64(0),
 			want2: false,
 		},
 		{
 			name:  "int64 test2",
 			text:  "-9223372036854775808",
 			want:  reflect.Int64,
-			want1: -9223372036854775808,
+			want1: int64(-9223372036854775808),
 			want2: false,
 		},
 		{
 			name:  "int64 test3",
 			text:  "9223372036854775807",
 			want:  reflect.Int64,
-			want1: 9223372036854775807,
+			want1: int64(9223372036854775807),
 			want2: false,
 		},
 		{

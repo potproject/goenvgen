@@ -1,4 +1,4 @@
-package main
+package gen
 
 import (
 	"reflect"
@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func gen(fileName string) error {
+func Gen(fileName string) error {
 	f := NewFile("envgen")
 
 	var envs map[string]string
