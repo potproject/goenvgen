@@ -2,10 +2,12 @@ package gen
 
 import (
 	"fmt"
+	"io/ioutil"
 	"reflect"
 	"sort"
 	"strings"
 
+	"github.com/ChimeraCoder/gojson"
 	. "github.com/dave/jennifer/jen"
 	"github.com/joho/godotenv"
 	"github.com/potproject/goenvgen/model"
@@ -13,7 +15,7 @@ import (
 
 func Gen(fileName string, packageName string) error {
 	f := NewFile(packageName)
-
+	f.ImportName("encoding/json", "json")
 	var envs map[string]string
 	var err error
 	if fileName == "" {
@@ -31,6 +33,7 @@ func Gen(fileName string, packageName string) error {
 	for _, i := range sortedKeys(envs) {
 		v := envs[i]
 		k, _, isS := checker(v)
+		genStructJSON(i, k, packageName, v)
 
 		structCode = append(structCode, genStructCode(i, k, isS))
 		interfaceCode = append(interfaceCode, genInterfaceCode(i, k, isS))
@@ -92,6 +95,8 @@ func genGetter(f *File, s string, k model.Kind, isS bool) {
 		i = i.Index()
 	}
 	switch k {
+	case model.JSON:
+		i = i.Id(s)
 	case model.Bool:
 		i = i.Bool()
 	case model.Int64:
@@ -114,6 +119,9 @@ func genSetter(f *File, s string, k model.Kind, isS bool) {
 		p = p.Index()
 	}
 	switch k {
+	case model.JSON:
+		p = p.Id(s)
+		i = i.Params(p)
 	case model.Bool:
 		p = p.Bool()
 		i = i.Params(p)
@@ -139,6 +147,8 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 		i = i.Index()
 	}
 	switch k {
+	case model.JSON:
+		return i.Id(s)
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -150,6 +160,17 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 	}
 }
 
+func genStructJSON(s string, k model.Kind, pkgName string, body string) {
+	if k != model.JSON {
+		return
+	}
+	input := strings.NewReader(body)
+	tagList := []string{"json"}
+	output, _ := gojson.Generate(input, gojson.ParseJson, s, pkgName, tagList, false, true)
+	outputName := fmt.Sprintf("%s/%s.go", pkgName, s)
+	ioutil.WriteFile(outputName, output, 0644)
+}
+
 func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
 	funcS := strings.Title(s)
 	i := Id(funcS).Params()
@@ -157,6 +178,8 @@ func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
 		i = i.Index()
 	}
 	switch k {
+	case model.JSON:
+		return i.Id(s)
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -225,6 +248,10 @@ func genSetCode(s string, k model.Kind, isS bool) []Code {
 		}
 	} else {
 		switch k {
+		case model.JSON:
+			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+			codes = append(codes, Var().Id(s).Id(s))
+			codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
 		case model.Bool:
 			codes = append(codes, Id(s).Op(":=").Lit(false))
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))

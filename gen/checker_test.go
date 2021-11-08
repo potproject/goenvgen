@@ -138,6 +138,27 @@ func Test_checker(t *testing.T) {
 			want1: []string{"true", "100", "abc"},
 			want2: true,
 		},
+		{
+			name:  "JSON test1",
+			text:  `{}`,
+			want:  model.JSON,
+			want1: map[string]interface{}{},
+			want2: false,
+		},
+		{
+			name:  "JSON test2",
+			text:  `{"id": 1, "Name": "Test" , "_r": 1.234567890}`,
+			want:  model.JSON,
+			want1: map[string]interface{}{"Name": string("Test"), "_r": float64(1.23456789), "id": float64(1)},
+			want2: false,
+		},
+		{
+			name:  "JSON test3",
+			text:  `{"IDs": [1,2,"500","ABC"]}`,
+			want:  model.JSON,
+			want1: map[string]interface{}{"IDs": []interface{}{float64(1), float64(2), string("500"), string("ABC")}},
+			want2: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

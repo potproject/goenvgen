@@ -1,6 +1,7 @@
 package gen
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -8,12 +9,29 @@ import (
 )
 
 func checker(text string) (model.Kind, interface{}, bool) {
-	k, i, isStruct := sliceChecker(text)
+	k, i, isStruct := jsonChecker(text)
+	if k == model.JSON {
+		return k, i, isStruct
+	}
+	k, i, isStruct = sliceChecker(text)
 	if isStruct {
 		return k, i, isStruct
 	}
 	k, i = typeChecker(text)
 	return k, i, isStruct
+}
+
+func jsonChecker(text string) (model.Kind, interface{}, bool) {
+	m := model.Invalid
+	var i interface{}
+	textt := strings.TrimSpace(text)
+	if strings.HasPrefix(textt, "{") && strings.HasSuffix(textt, "}") {
+		err := json.Unmarshal([]byte(text), &i)
+		if err == nil {
+			m = model.JSON
+		}
+	}
+	return m, i, false
 }
 
 func sliceChecker(text string) (model.Kind, interface{}, bool) {
