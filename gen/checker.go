@@ -1,12 +1,13 @@
 package gen
 
 import (
-	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/potproject/goenvgen/model"
 )
 
-func checker(text string) (reflect.Kind, interface{}, bool) {
+func checker(text string) (model.Kind, interface{}, bool) {
 	k, i, isStruct := sliceChecker(text)
 	if isStruct {
 		return k, i, isStruct
@@ -15,17 +16,17 @@ func checker(text string) (reflect.Kind, interface{}, bool) {
 	return k, i, isStruct
 }
 
-func sliceChecker(text string) (reflect.Kind, interface{}, bool) {
+func sliceChecker(text string) (model.Kind, interface{}, bool) {
 	if strings.Index(text, ",") != -1 {
 		slice := strings.Split(text, ",")
 		typeC, _ := typeChecker(slice[0])
 		for i := 1; i < len(slice); i++ {
 			k, _ := typeChecker(slice[i])
 			if typeC != k {
-				typeC = reflect.String
+				typeC = model.String
 			}
 		}
-		if typeC == reflect.Bool {
+		if typeC == model.Bool {
 			var bs []bool
 			for _, v := range slice {
 				if strings.ToLower(v) == "true" {
@@ -36,7 +37,7 @@ func sliceChecker(text string) (reflect.Kind, interface{}, bool) {
 			}
 			return typeC, bs, true
 		}
-		if typeC == reflect.Int64 {
+		if typeC == model.Int64 {
 			var is []int64
 			for _, v := range slice {
 				i, _ := strconv.ParseInt(v, 10, 64)
@@ -44,7 +45,7 @@ func sliceChecker(text string) (reflect.Kind, interface{}, bool) {
 			}
 			return typeC, is, true
 		}
-		if typeC == reflect.Float64 {
+		if typeC == model.Float64 {
 			var fs []float64
 			for _, v := range slice {
 				f, _ := strconv.ParseFloat(v, 64)
@@ -54,23 +55,23 @@ func sliceChecker(text string) (reflect.Kind, interface{}, bool) {
 		}
 		return typeC, slice, true
 	}
-	return reflect.Invalid, 0, false
+	return model.Invalid, 0, false
 }
 
-func typeChecker(text string) (reflect.Kind, interface{}) {
+func typeChecker(text string) (model.Kind, interface{}) {
 	if strings.ToLower(text) == "true" {
-		return reflect.Bool, true
+		return model.Bool, true
 	}
 	if strings.ToLower(text) == "false" {
-		return reflect.Bool, false
+		return model.Bool, false
 	}
 	i, err := strconv.ParseInt(text, 10, 64)
 	if err == nil {
-		return reflect.Int64, i
+		return model.Int64, i
 	}
 	f, err := strconv.ParseFloat(text, 64)
 	if err == nil {
-		return reflect.Float64, f
+		return model.Float64, f
 	}
-	return reflect.String, text
+	return model.String, text
 }

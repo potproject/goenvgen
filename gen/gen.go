@@ -1,16 +1,18 @@
 package gen
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
 
 	. "github.com/dave/jennifer/jen"
 	"github.com/joho/godotenv"
+	"github.com/potproject/goenvgen/model"
 )
 
-func Gen(fileName string) error {
-	f := NewFile("envgen")
+func Gen(fileName string, packageName string) error {
+	f := NewFile(packageName)
 
 	var envs map[string]string
 	var err error
@@ -80,21 +82,21 @@ func Gen(fileName string) error {
 	)
 
 	// End...
-	return f.Save("envgen/envgen.go")
+	return f.Save(fmt.Sprintf("%s/%s.go", packageName, packageName))
 }
 
-func genGetter(f *File, s string, k reflect.Kind, isS bool) {
+func genGetter(f *File, s string, k model.Kind, isS bool) {
 	funcS := strings.Title(s)
 	i := f.Func().Params(Id("g").Id("getter")).Id(funcS).Params()
 	if isS {
 		i = i.Index()
 	}
 	switch k {
-	case reflect.Bool:
+	case model.Bool:
 		i = i.Bool()
-	case reflect.Int64:
+	case model.Int64:
 		i = i.Int64()
-	case reflect.Float64:
+	case model.Float64:
 		i = i.Float64()
 	default:
 		i = i.String()
@@ -104,7 +106,7 @@ func genGetter(f *File, s string, k reflect.Kind, isS bool) {
 	)
 }
 
-func genSetter(f *File, s string, k reflect.Kind, isS bool) {
+func genSetter(f *File, s string, k model.Kind, isS bool) {
 	funcS := strings.Title(s)
 	i := f.Func().Params(Id("s").Id("setter")).Id(funcS)
 	p := Id("value")
@@ -112,13 +114,13 @@ func genSetter(f *File, s string, k reflect.Kind, isS bool) {
 		p = p.Index()
 	}
 	switch k {
-	case reflect.Bool:
+	case model.Bool:
 		p = p.Bool()
 		i = i.Params(p)
-	case reflect.Int64:
+	case model.Int64:
 		p = p.Int64()
 		i = i.Params(p)
-	case reflect.Float64:
+	case model.Float64:
 		p = p.Float64()
 		i = i.Params(p)
 	default:
@@ -131,46 +133,46 @@ func genSetter(f *File, s string, k reflect.Kind, isS bool) {
 	)
 }
 
-func genStructCode(s string, k reflect.Kind, isS bool) *Statement {
+func genStructCode(s string, k model.Kind, isS bool) *Statement {
 	i := Id(s)
 	if isS {
 		i = i.Index()
 	}
 	switch k {
-	case reflect.Bool:
+	case model.Bool:
 		return i.Bool()
-	case reflect.Int64:
+	case model.Int64:
 		return i.Int64()
-	case reflect.Float64:
+	case model.Float64:
 		return i.Float64()
 	default:
 		return i.String()
 	}
 }
 
-func genInterfaceCode(s string, k reflect.Kind, isS bool) *Statement {
+func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
 	funcS := strings.Title(s)
 	i := Id(funcS).Params()
 	if isS {
 		i = i.Index()
 	}
 	switch k {
-	case reflect.Bool:
+	case model.Bool:
 		return i.Bool()
-	case reflect.Int64:
+	case model.Int64:
 		return i.Int64()
-	case reflect.Float64:
+	case model.Float64:
 		return i.Float64()
 	default:
 		return i.String()
 	}
 }
 
-func genSetCode(s string, k reflect.Kind, isS bool) []Code {
+func genSetCode(s string, k model.Kind, isS bool) []Code {
 	var codes []Code
 	if isS {
 		switch k {
-		case reflect.Bool:
+		case model.Bool:
 			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 				Qual("os", "Getenv").Call(Lit(s)),
 				Lit(","),
@@ -185,7 +187,7 @@ func genSetCode(s string, k reflect.Kind, isS bool) []Code {
 					),
 				),
 			)
-		case reflect.Int64:
+		case model.Int64:
 			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 				Qual("os", "Getenv").Call(Lit(s)),
 				Lit(","),
@@ -200,7 +202,7 @@ func genSetCode(s string, k reflect.Kind, isS bool) []Code {
 					Id(s).Op("=").Append(Id(s), Id("i")),
 				),
 			)
-		case reflect.Float64:
+		case model.Float64:
 			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 				Qual("os", "Getenv").Call(Lit(s)),
 				Lit(","),
@@ -223,7 +225,7 @@ func genSetCode(s string, k reflect.Kind, isS bool) []Code {
 		}
 	} else {
 		switch k {
-		case reflect.Bool:
+		case model.Bool:
 			codes = append(codes, Id(s).Op(":=").Lit(false))
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
 			codes = append(codes,
@@ -231,7 +233,7 @@ func genSetCode(s string, k reflect.Kind, isS bool) []Code {
 					Id(s).Op("=").Lit(true),
 				),
 			)
-		case reflect.Int64:
+		case model.Int64:
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
 			codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "ParseInt").Call(Id(s+"__S"), Lit(10), Lit(64)))
 			codes = append(codes,
@@ -239,7 +241,7 @@ func genSetCode(s string, k reflect.Kind, isS bool) []Code {
 					Return(Id("err")),
 				),
 			)
-		case reflect.Float64:
+		case model.Float64:
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
 			codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "ParseFloat").Call(Id(s+"__S"), Lit(64)))
 			codes = append(codes,

@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	err := gen.Gen("test/.env.test")
+	err := gen.Gen("test/.env.test", "envgen")
 	if err != nil {
 		panic(err)
 	}
