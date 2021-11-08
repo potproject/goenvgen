@@ -96,7 +96,7 @@ func genGetter(f *File, s string, k model.Kind, isS bool) {
 	}
 	switch k {
 	case model.JSON:
-		i = i.Id(s)
+		i = i.Id(strings.Title(s))
 	case model.Bool:
 		i = i.Bool()
 	case model.Int64:
@@ -120,7 +120,7 @@ func genSetter(f *File, s string, k model.Kind, isS bool) {
 	}
 	switch k {
 	case model.JSON:
-		p = p.Id(s)
+		p = p.Id(strings.Title(s))
 		i = i.Params(p)
 	case model.Bool:
 		p = p.Bool()
@@ -148,7 +148,7 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 	}
 	switch k {
 	case model.JSON:
-		return i.Id(s)
+		return i.Id(strings.Title(s))
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -164,9 +164,10 @@ func genStructJSON(s string, k model.Kind, pkgName string, body string) {
 	if k != model.JSON {
 		return
 	}
+	structName := strings.Title(s)
 	input := strings.NewReader(body)
 	tagList := []string{"json"}
-	output, _ := gojson.Generate(input, gojson.ParseJson, s, pkgName, tagList, false, true)
+	output, _ := gojson.Generate(input, gojson.ParseJson, structName, pkgName, tagList, false, true)
 	outputName := fmt.Sprintf("%s/%s.go", pkgName, s)
 	ioutil.WriteFile(outputName, output, 0644)
 }
@@ -179,7 +180,7 @@ func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
 	}
 	switch k {
 	case model.JSON:
-		return i.Id(s)
+		return i.Id(strings.Title(s))
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -250,7 +251,7 @@ func genSetCode(s string, k model.Kind, isS bool) []Code {
 		switch k {
 		case model.JSON:
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes, Var().Id(s).Id(s))
+			codes = append(codes, Var().Id(s).Id(strings.Title(s)))
 			codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
 		case model.Bool:
 			codes = append(codes, Id(s).Op(":=").Lit(false))
