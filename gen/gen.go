@@ -1,8 +1,9 @@
 package gen
 
 import (
-	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -25,6 +26,13 @@ func Gen(fileName string, packageName string) error {
 	if err != nil {
 		return err
 	}
+	// make Directory
+	p := filepath.Join(".", packageName)
+	err = os.MkdirAll(p, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	// struct & Load
 	structCode := make([]Code, len(envs))
 	interfaceCode := make([]Code, len(envs))
@@ -85,7 +93,7 @@ func Gen(fileName string, packageName string) error {
 	)
 
 	// End...
-	return f.Save(fmt.Sprintf("%s/%s.go", packageName, packageName))
+	return f.Save(filepath.Join(p, packageName+".go"))
 }
 
 func genGetter(f *File, s string, k model.Kind, isS bool) {
@@ -168,7 +176,7 @@ func genStructJSON(s string, k model.Kind, pkgName string, body string) {
 	input := strings.NewReader(body)
 	tagList := []string{"json"}
 	output, _ := gojson.Generate(input, gojson.ParseJson, structName, pkgName, tagList, false, true)
-	outputName := fmt.Sprintf("%s/%s.go", pkgName, s)
+	outputName := filepath.Join(".", pkgName, s+".go")
 	ioutil.WriteFile(outputName, output, 0644)
 }
 
