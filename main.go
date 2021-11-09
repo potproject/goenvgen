@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	err := gen.GenerateFile("test/.env.test", "envgen")
+	err := gen.GenerateFile("test/.env.test", "envgen", map[string]string{})
 	if err != nil {
 		panic(err)
 	}

@@ -17,7 +17,7 @@ import (
 	"github.com/potproject/goenvgen/model"
 )
 
-func GenerateFile(fileName string, packageName string) error {
+func GenerateFile(fileName string, packageName string, forceType map[string]string) error {
 	var envs map[string]string
 	var err error
 	if fileName == "" {
@@ -28,7 +28,7 @@ func GenerateFile(fileName string, packageName string) error {
 	if err != nil {
 		return err
 	}
-	files, err := Generate(envs, packageName)
+	files, err := Generate(envs, packageName, forceType)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func GenerateFile(fileName string, packageName string) error {
 	return nil
 }
 
-func Generate(envs map[string]string, packageName string) (map[string][]byte, error) {
+func Generate(envs map[string]string, packageName string, forceType map[string]string) (map[string][]byte, error) {
 	outputs := map[string][]byte{}
 
 	// sort & validate
@@ -55,6 +55,12 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 	f := NewFile(packageName)
 	f.ImportName("encoding/json", "json")
 
+	// Force Set Type
+	forceSetKind, err := forceTypeSetter(forceType)
+	if err != nil {
+		return outputs, err
+	}
+
 	// struct & Load
 	structCode := make([]Code, len(envs))
 	interfaceCode := make([]Code, len(envs))
@@ -62,7 +68,10 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 	setDict := Dict{}
 	for _, i := range sortedEnvs {
 		v := envs[i]
-		ks, _ := checker(v)
+		ks, ok := forceSetKind[i]
+		if !ok {
+			ks, _ = checker(v)
+		}
 		if ks.Kind == model.JSON {
 			on, o := genStructJSON(i, packageName, v)
 			outputs[on] = o
