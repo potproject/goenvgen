@@ -10,7 +10,6 @@ const (
 	Int16
 	Int32
 	Int64
-	Uint
 	Uint8
 	Uint16
 	Uint32
@@ -29,7 +28,6 @@ var KindSupportForceType = map[string]Kind{
 	"int16":     Int16,
 	"int32":     Int32,
 	"int64":     Int64,
-	"uint":      Uint,
 	"uint8":     Uint8,
 	"uint16":    Uint16,
 	"uint32":    Uint32,

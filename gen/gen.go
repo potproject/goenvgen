@@ -142,18 +142,7 @@ func genGetter(f *File, s string, ks model.KindWithSlice) {
 	if ks.Slice {
 		i = i.Index()
 	}
-	switch ks.Kind {
-	case model.JSON:
-		i = i.Id(varNormalize(s))
-	case model.Bool:
-		i = i.Bool()
-	case model.Int64:
-		i = i.Int64()
-	case model.Float64:
-		i = i.Float64()
-	default:
-		i = i.String()
-	}
+	i = kindToStatement(s, ks, i)
 	i.Block(
 		Return().Id("env." + s),
 	)
@@ -166,23 +155,8 @@ func genSetter(f *File, s string, ks model.KindWithSlice) {
 	if ks.Slice {
 		p = p.Index()
 	}
-	switch ks.Kind {
-	case model.JSON:
-		p = p.Id(varNormalize(s))
-		i = i.Params(p)
-	case model.Bool:
-		p = p.Bool()
-		i = i.Params(p)
-	case model.Int64:
-		p = p.Int64()
-		i = i.Params(p)
-	case model.Float64:
-		p = p.Float64()
-		i = i.Params(p)
-	default:
-		p = p.String()
-		i = i.Params(p)
-	}
+	p = kindToStatement(s, ks, p)
+	i = i.Params(p)
 	i.Block(
 		Id("env."+s).Op("=").Id("value"),
 		Return(),
@@ -194,18 +168,7 @@ func genStructCode(s string, ks model.KindWithSlice) *Statement {
 	if ks.Slice {
 		i = i.Index()
 	}
-	switch ks.Kind {
-	case model.JSON:
-		return i.Id(varNormalize(s))
-	case model.Bool:
-		return i.Bool()
-	case model.Int64:
-		return i.Int64()
-	case model.Float64:
-		return i.Float64()
-	default:
-		return i.String()
-	}
+	return kindToStatement(s, ks, i)
 }
 
 func genStructJSON(s string, pkgName string, body string) (outputName string, output []byte) {
@@ -223,110 +186,7 @@ func genInterfaceCode(s string, ks model.KindWithSlice) *Statement {
 	if ks.Slice {
 		i = i.Index()
 	}
-	switch ks.Kind {
-	case model.JSON:
-		return i.Id(varNormalize(s))
-	case model.Bool:
-		return i.Bool()
-	case model.Int64:
-		return i.Int64()
-	case model.Float64:
-		return i.Float64()
-	default:
-		return i.String()
-	}
-}
-
-func genSetCode(s string, ks model.KindWithSlice) []Code {
-	var codes []Code
-	if ks.Slice {
-		switch ks.Kind {
-		case model.Bool:
-			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
-				Qual("os", "Getenv").Call(Lit(s)),
-				Lit(","),
-			))
-			codes = append(codes, Var().Id(s).Index().Bool())
-			codes = append(codes,
-				For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
-					If(Qual("strings", "ToLower").Call(Id("v")).Op("==").Lit("true")).Block(
-						Id(s).Op("=").Append(Id(s), Lit(true)),
-					).Else().Block(
-						Id(s).Op("=").Append(Id(s), Lit(false)),
-					),
-				),
-			)
-		case model.Int64:
-			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
-				Qual("os", "Getenv").Call(Lit(s)),
-				Lit(","),
-			))
-			codes = append(codes, Var().Id(s).Index().Int64())
-			codes = append(codes,
-				For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
-					List(Id("i"), Id("err")).Op(":=").Qual("strconv", "ParseInt").Call(Id("v"), Lit(10), Lit(64)),
-					If(Id("err").Op("!=").Nil()).Block(
-						Return(Id("err")),
-					),
-					Id(s).Op("=").Append(Id(s), Id("i")),
-				),
-			)
-		case model.Float64:
-			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
-				Qual("os", "Getenv").Call(Lit(s)),
-				Lit(","),
-			))
-			codes = append(codes, Var().Id(s).Index().Float64())
-			codes = append(codes,
-				For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
-					List(Id("i"), Id("err")).Op(":=").Qual("strconv", "ParseFloat").Call(Id("v"), Lit(64)),
-					If(Id("err").Op("!=").Nil()).Block(
-						Return(Id("err")),
-					),
-					Id(s).Op("=").Append(Id(s), Id("i")),
-				),
-			)
-		default:
-			codes = append(codes, Id(s).Op(":=").Qual("strings", "Split").Call(
-				Qual("os", "Getenv").Call(Lit(s)),
-				Lit(","),
-			))
-		}
-	} else {
-		switch ks.Kind {
-		case model.JSON:
-			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes, Var().Id(s).Id(varNormalize(s)))
-			codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
-		case model.Bool:
-			codes = append(codes, Id(s).Op(":=").Lit(false))
-			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes,
-				If(Qual("strings", "ToLower").Call(Id(s+"__S")).Op("==").Lit("true")).Block(
-					Id(s).Op("=").Lit(true),
-				),
-			)
-		case model.Int64:
-			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "ParseInt").Call(Id(s+"__S"), Lit(10), Lit(64)))
-			codes = append(codes,
-				If(Id("err").Op("!=").Nil()).Block(
-					Return(Id("err")),
-				),
-			)
-		case model.Float64:
-			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "ParseFloat").Call(Id(s+"__S"), Lit(64)))
-			codes = append(codes,
-				If(Id("err").Op("!=").Nil()).Block(
-					Return(Id("err")),
-				),
-			)
-		default:
-			codes = append(codes, Id(s).Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-		}
-	}
-	return codes
+	return kindToStatement(s, ks, i)
 }
 
 func sortedKeys(m interface{}) []string {
@@ -390,4 +250,39 @@ func forceTypeSetter(m map[string]string) (map[string]model.KindWithSlice, error
 		}
 	}
 	return r, nil
+}
+
+func kindToStatement(s string, ks model.KindWithSlice, i *Statement) *Statement {
+	switch ks.Kind {
+	case model.Bool:
+		return i.Bool()
+	case model.Int:
+		return i.Int()
+	case model.Int8:
+		return i.Int8()
+	case model.Int16:
+		return i.Int16()
+	case model.Int32:
+		return i.Int32()
+	case model.Int64:
+		return i.Int64()
+	case model.Uint8:
+		return i.Uint8()
+	case model.Uint16:
+		return i.Uint16()
+	case model.Uint32:
+		return i.Uint32()
+	case model.Uint64:
+		return i.Uint64()
+	case model.Float32:
+		return i.Float32()
+	case model.Float64:
+		return i.Float64()
+	case model.Interface:
+		return i.Interface()
+	case model.JSON:
+		return i.Id(varNormalize(s))
+	default:
+		return i.String()
+	}
 }

@@ -29,7 +29,7 @@ func Test_GenerateFile_NotExist(t *testing.T) {
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
 
-func Test_GenerateDuplicateEnvTest(t *testing.T) {
+func Test_GenerateFile_DuplicateEnvTest(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".duplicate.env.test")
 	testpackage := "envgen"
@@ -40,11 +40,49 @@ func Test_GenerateDuplicateEnvTest(t *testing.T) {
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
 
-func Test_GenerateUnderlineEnvTest(t *testing.T) {
+func Test_GenerateFile_UnderlineEnvTest(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".underline.env.test")
 	testpackage := "envgen"
 	err := GenerateFile(testfile, testpackage, map[string]string{})
+	if err != nil {
+		t.Error(err.Error())
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
+func Test_GenerateFile_ForceEnvTest(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "test", ".force.env.test")
+	testpackage := "envgen"
+	err := GenerateFile(testfile, testpackage, map[string]string{
+		"FORCE_BOOL":        "bool",
+		"FORCE_INT":         "int",
+		"FORCE_INT8":        "int8",
+		"FORCE_INT16":       "int16",
+		"FORCE_INT32":       "int32",
+		"FORCE_INT64":       "int64",
+		"FORCE_UINT8":       "uint8",
+		"FORCE_UINT16":      "uint16",
+		"FORCE_UINT32":      "uint32",
+		"FORCE_UINT64":      "uint64",
+		"FORCE_FLOAT32":     "float32",
+		"FORCE_FLOAT64":     "float64",
+		"FORCE_INTERFACE":   "interface",
+		"FORCE_S_BOOL":      "[]bool",
+		"FORCE_S_INT":       "[]int",
+		"FORCE_S_INT8":      "[]int8",
+		"FORCE_S_INT16":     "[]int16",
+		"FORCE_S_INT32":     "[]int32",
+		"FORCE_S_INT64":     "[]int64",
+		"FORCE_S_UINT8":     "[]uint8",
+		"FORCE_S_UINT16":    "[]uint16",
+		"FORCE_S_UINT32":    "[]uint32",
+		"FORCE_S_UINT64":    "[]uint64",
+		"FORCE_S_FLOAT32":   "[]float32",
+		"FORCE_S_FLOAT64":   "[]float64",
+		"FORCE_S_INTERFACE": "[]interface",
+	})
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -82,14 +120,14 @@ func Test_forceTypeSetter(t *testing.T) {
 		"ENV_BOOL":      "bool",
 		"ENV_INT8":      "int8",
 		"ENV_STRING":    "string",
-		"ENV_UINT":      "uint",
+		"ENV_UINT64":    "uint64",
 		"ENV_INTERFACE": "interface",
 	}
 	expect := map[string]model.KindWithSlice{
 		"ENV_BOOL":      model.KindWithSlice{Kind: model.Bool, Slice: false},
 		"ENV_INT8":      model.KindWithSlice{Kind: model.Int8, Slice: false},
 		"ENV_STRING":    model.KindWithSlice{Kind: model.String, Slice: false},
-		"ENV_UINT":      model.KindWithSlice{Kind: model.Uint, Slice: false},
+		"ENV_UINT64":    model.KindWithSlice{Kind: model.Uint64, Slice: false},
 		"ENV_INTERFACE": model.KindWithSlice{Kind: model.Interface, Slice: false},
 	}
 	actual, err := forceTypeSetter(m)
@@ -106,14 +144,14 @@ func Test_forceTypeSetterSlice(t *testing.T) {
 		"ENV_S_BOOL":      "[]bool",
 		"ENV_S_INT8":      "[]int8",
 		"ENV_S_STRING":    "[]string",
-		"ENV_S_UINT":      "[]uint",
+		"ENV_S_UINT64":    "[]uint64",
 		"ENV_S_INTERFACE": "[]interface",
 	}
 	expect := map[string]model.KindWithSlice{
 		"ENV_S_BOOL":      model.KindWithSlice{Kind: model.Bool, Slice: true},
 		"ENV_S_INT8":      model.KindWithSlice{Kind: model.Int8, Slice: true},
 		"ENV_S_STRING":    model.KindWithSlice{Kind: model.String, Slice: true},
-		"ENV_S_UINT":      model.KindWithSlice{Kind: model.Uint, Slice: true},
+		"ENV_S_UINT64":    model.KindWithSlice{Kind: model.Uint64, Slice: true},
 		"ENV_S_INTERFACE": model.KindWithSlice{Kind: model.Interface, Slice: true},
 	}
 	actual, err := forceTypeSetter(m)
