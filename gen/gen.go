@@ -1,6 +1,7 @@
 package gen
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,24 +15,37 @@ import (
 	"github.com/potproject/goenvgen/model"
 )
 
-func Gen(fileName string, packageName string) error {
-	f := NewFile(packageName)
-	f.ImportName("encoding/json", "json")
+func GenerateFile(fileName string, packageName string) error {
 	var envs map[string]string
 	var err error
 	if fileName == "" {
 		envs, err = godotenv.Read()
+	} else {
+		envs, err = godotenv.Read(fileName)
 	}
-	envs, err = godotenv.Read(fileName)
 	if err != nil {
 		return err
 	}
-	// make Directory
+	files, err := Generate(envs, packageName)
+	if err != nil {
+		return err
+	}
+
+	// make Directory & File
 	p := filepath.Join(".", packageName)
-	err = os.MkdirAll(p, os.ModePerm)
-	if err != nil {
-		return err
+	os.MkdirAll(p, os.ModePerm)
+	for path, body := range files {
+		ioutil.WriteFile(path, body, 0644)
 	}
+	return nil
+}
+
+func Generate(envs map[string]string, packageName string) (map[string][]byte, error) {
+	f := NewFile(packageName)
+	f.ImportName("encoding/json", "json")
+
+	// outputs
+	outputs := map[string][]byte{}
 
 	// struct & Load
 	structCode := make([]Code, len(envs))
@@ -41,8 +55,10 @@ func Gen(fileName string, packageName string) error {
 	for _, i := range sortedKeys(envs) {
 		v := envs[i]
 		k, _, isS := checker(v)
-		genStructJSON(i, k, packageName, v)
-
+		if k == model.JSON {
+			on, o := genStructJSON(i, packageName, v)
+			outputs[on] = o
+		}
 		structCode = append(structCode, genStructCode(i, k, isS))
 		interfaceCode = append(interfaceCode, genInterfaceCode(i, k, isS))
 		setCode = append(setCode, genSetCode(i, k, isS)...)
@@ -92,8 +108,15 @@ func Gen(fileName string, packageName string) error {
 		Return().Id("setter").Block(),
 	)
 
-	// End...
-	return f.Save(filepath.Join(p, packageName+".go"))
+	// Render...
+	buf := &bytes.Buffer{}
+	err := f.Render(buf)
+	if err != nil {
+		return outputs, err
+	}
+	fileName := filepath.Join(".", packageName, packageName+".go")
+	outputs[fileName] = buf.Bytes()
+	return outputs, err
 }
 
 func genGetter(f *File, s string, k model.Kind, isS bool) {
@@ -168,16 +191,13 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 	}
 }
 
-func genStructJSON(s string, k model.Kind, pkgName string, body string) {
-	if k != model.JSON {
-		return
-	}
+func genStructJSON(s string, pkgName string, body string) (outputName string, output []byte) {
 	structName := strings.Title(s)
 	input := strings.NewReader(body)
 	tagList := []string{"json"}
-	output, _ := gojson.Generate(input, gojson.ParseJson, structName, pkgName, tagList, false, true)
-	outputName := filepath.Join(".", pkgName, s+".go")
-	ioutil.WriteFile(outputName, output, 0644)
+	output, _ = gojson.Generate(input, gojson.ParseJson, structName, pkgName, tagList, false, true)
+	outputName = filepath.Join(".", pkgName, s+".go")
+	return
 }
 
 func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {

@@ -8,21 +8,21 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_Gen(t *testing.T) {
+func Test_GenerateFile(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".env.test")
 	testpackage := "envgen"
-	err := Gen(testfile, testpackage)
+	err := GenerateFile(testfile, testpackage)
 	if err != nil {
 		t.Error(err.Error())
 	}
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
 
-func Test_Gen_NotExist(t *testing.T) {
+func Test_GenerateFile_NotExist(t *testing.T) {
 	testpackage := "envgen"
-	err := Gen("", testpackage)
-	if err.Error() != "open : The system cannot find the file specified." {
+	err := GenerateFile("", testpackage)
+	if err.Error() != "open .env: The system cannot find the file specified." {
 		t.Error("Error: Not Exist Pattern Failed")
 	}
 	os.RemoveAll(filepath.Join(".", testpackage))
