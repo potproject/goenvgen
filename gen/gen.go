@@ -2,12 +2,14 @@ package gen
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
+	"unicode"
 
 	"github.com/ChimeraCoder/gojson"
 	. "github.com/dave/jennifer/jen"
@@ -41,18 +43,24 @@ func GenerateFile(fileName string, packageName string) error {
 }
 
 func Generate(envs map[string]string, packageName string) (map[string][]byte, error) {
+	outputs := map[string][]byte{}
+
+	// sort & validate
+	sortedEnvs := sortedKeys(envs)
+	err := validate(sortedEnvs)
+	if err != nil {
+		return outputs, err
+	}
+
 	f := NewFile(packageName)
 	f.ImportName("encoding/json", "json")
-
-	// outputs
-	outputs := map[string][]byte{}
 
 	// struct & Load
 	structCode := make([]Code, len(envs))
 	interfaceCode := make([]Code, len(envs))
 	setCode := make([]Code, len(envs))
 	setDict := Dict{}
-	for _, i := range sortedKeys(envs) {
+	for _, i := range sortedEnvs {
 		v := envs[i]
 		k, _, isS := checker(v)
 		if k == model.JSON {
@@ -73,7 +81,7 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 		Id("env").Op("=").Id("environment").Values(setDict),
 	)
 	setCode = append([]Code{Var().Id("err").Id("error")}, setCode...)
-	setCode = append(setCode, Return(Nil()))
+	setCode = append(setCode, Return(Id("err")))
 	f.Func().Id("Load").Params().Error().Block(
 		setCode...,
 	)
@@ -110,7 +118,7 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 
 	// Render...
 	buf := &bytes.Buffer{}
-	err := f.Render(buf)
+	err = f.Render(buf)
 	if err != nil {
 		return outputs, err
 	}
@@ -120,14 +128,14 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 }
 
 func genGetter(f *File, s string, k model.Kind, isS bool) {
-	funcS := strings.Title(s)
+	funcS := varNormalize(s)
 	i := f.Func().Params(Id("g").Id("getter")).Id(funcS).Params()
 	if isS {
 		i = i.Index()
 	}
 	switch k {
 	case model.JSON:
-		i = i.Id(strings.Title(s))
+		i = i.Id(varNormalize(s))
 	case model.Bool:
 		i = i.Bool()
 	case model.Int64:
@@ -143,7 +151,7 @@ func genGetter(f *File, s string, k model.Kind, isS bool) {
 }
 
 func genSetter(f *File, s string, k model.Kind, isS bool) {
-	funcS := strings.Title(s)
+	funcS := varNormalize(s)
 	i := f.Func().Params(Id("s").Id("setter")).Id(funcS)
 	p := Id("value")
 	if isS {
@@ -151,7 +159,7 @@ func genSetter(f *File, s string, k model.Kind, isS bool) {
 	}
 	switch k {
 	case model.JSON:
-		p = p.Id(strings.Title(s))
+		p = p.Id(varNormalize(s))
 		i = i.Params(p)
 	case model.Bool:
 		p = p.Bool()
@@ -179,7 +187,7 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 	}
 	switch k {
 	case model.JSON:
-		return i.Id(strings.Title(s))
+		return i.Id(varNormalize(s))
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -192,7 +200,7 @@ func genStructCode(s string, k model.Kind, isS bool) *Statement {
 }
 
 func genStructJSON(s string, pkgName string, body string) (outputName string, output []byte) {
-	structName := strings.Title(s)
+	structName := varNormalize(s)
 	input := strings.NewReader(body)
 	tagList := []string{"json"}
 	output, _ = gojson.Generate(input, gojson.ParseJson, structName, pkgName, tagList, false, true)
@@ -201,14 +209,14 @@ func genStructJSON(s string, pkgName string, body string) (outputName string, ou
 }
 
 func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
-	funcS := strings.Title(s)
+	funcS := varNormalize(s)
 	i := Id(funcS).Params()
 	if isS {
 		i = i.Index()
 	}
 	switch k {
 	case model.JSON:
-		return i.Id(strings.Title(s))
+		return i.Id(varNormalize(s))
 	case model.Bool:
 		return i.Bool()
 	case model.Int64:
@@ -279,7 +287,7 @@ func genSetCode(s string, k model.Kind, isS bool) []Code {
 		switch k {
 		case model.JSON:
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
-			codes = append(codes, Var().Id(s).Id(strings.Title(s)))
+			codes = append(codes, Var().Id(s).Id(varNormalize(s)))
 			codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
 		case model.Bool:
 			codes = append(codes, Id(s).Op(":=").Lit(false))
@@ -320,4 +328,36 @@ func sortedKeys(m interface{}) []string {
 	}
 	sort.Strings(r)
 	return r
+}
+
+func validate(keys []string) error {
+	for _, v := range keys {
+		// duplicate check
+		if isFirstLower(v) {
+			vt := strings.Title(v)
+			i := sort.SearchStrings(keys, vt)
+			if i != len(keys) && keys[i] == vt {
+				return fmt.Errorf("duplicate Env fields. %s:%s", v, vt)
+			}
+		}
+	}
+	return nil
+}
+
+func isFirstLower(v string) bool {
+	if v == "" {
+		return false
+	}
+	r := rune(v[0])
+	return unicode.IsLower(r)
+}
+
+func varNormalize(v string) string {
+	if v == "" {
+		return ""
+	}
+	if strings.HasPrefix(v, "_") {
+		return "UNDERLINE" + v
+	}
+	return strings.Title(v)
 }
