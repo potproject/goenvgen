@@ -8,20 +8,30 @@ import (
 	"github.com/potproject/goenvgen/model"
 )
 
-func checker(text string) (model.Kind, interface{}, bool) {
-	k, i, isStruct := jsonChecker(text)
+func checker(text string) (model.KindWithSlice, interface{}) {
+	isSlice := false
+	k, i := jsonChecker(text)
 	if k == model.JSON {
-		return k, i, isStruct
+		return model.KindWithSlice{
+			Kind:  k,
+			Slice: isSlice,
+		}, i
 	}
-	k, i, isStruct = sliceChecker(text)
-	if isStruct {
-		return k, i, isStruct
+	k, i, isSlice = sliceChecker(text)
+	if isSlice {
+		return model.KindWithSlice{
+			Kind:  k,
+			Slice: isSlice,
+		}, i
 	}
 	k, i = typeChecker(text)
-	return k, i, isStruct
+	return model.KindWithSlice{
+		Kind:  k,
+		Slice: isSlice,
+	}, i
 }
 
-func jsonChecker(text string) (model.Kind, interface{}, bool) {
+func jsonChecker(text string) (model.Kind, interface{}) {
 	m := model.Invalid
 	var i interface{}
 	textt := strings.TrimSpace(text)
@@ -31,7 +41,7 @@ func jsonChecker(text string) (model.Kind, interface{}, bool) {
 			m = model.JSON
 		}
 	}
-	return m, i, false
+	return m, i
 }
 
 func sliceChecker(text string) (model.Kind, interface{}, bool) {

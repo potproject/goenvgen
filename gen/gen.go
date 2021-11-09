@@ -62,16 +62,16 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 	setDict := Dict{}
 	for _, i := range sortedEnvs {
 		v := envs[i]
-		k, _, isS := checker(v)
-		if k == model.JSON {
+		ks, _ := checker(v)
+		if ks.Kind == model.JSON {
 			on, o := genStructJSON(i, packageName, v)
 			outputs[on] = o
 		}
-		structCode = append(structCode, genStructCode(i, k, isS))
-		interfaceCode = append(interfaceCode, genInterfaceCode(i, k, isS))
-		setCode = append(setCode, genSetCode(i, k, isS)...)
-		genGetter(f, i, k, isS)
-		genSetter(f, i, k, isS)
+		structCode = append(structCode, genStructCode(i, ks))
+		interfaceCode = append(interfaceCode, genInterfaceCode(i, ks))
+		setCode = append(setCode, genSetCode(i, ks)...)
+		genGetter(f, i, ks)
+		genSetter(f, i, ks)
 		setDict[Id(i)] = Id(i)
 	}
 
@@ -127,13 +127,13 @@ func Generate(envs map[string]string, packageName string) (map[string][]byte, er
 	return outputs, err
 }
 
-func genGetter(f *File, s string, k model.Kind, isS bool) {
+func genGetter(f *File, s string, ks model.KindWithSlice) {
 	funcS := varNormalize(s)
 	i := f.Func().Params(Id("g").Id("getter")).Id(funcS).Params()
-	if isS {
+	if ks.Slice {
 		i = i.Index()
 	}
-	switch k {
+	switch ks.Kind {
 	case model.JSON:
 		i = i.Id(varNormalize(s))
 	case model.Bool:
@@ -150,14 +150,14 @@ func genGetter(f *File, s string, k model.Kind, isS bool) {
 	)
 }
 
-func genSetter(f *File, s string, k model.Kind, isS bool) {
+func genSetter(f *File, s string, ks model.KindWithSlice) {
 	funcS := varNormalize(s)
 	i := f.Func().Params(Id("s").Id("setter")).Id(funcS)
 	p := Id("value")
-	if isS {
+	if ks.Slice {
 		p = p.Index()
 	}
-	switch k {
+	switch ks.Kind {
 	case model.JSON:
 		p = p.Id(varNormalize(s))
 		i = i.Params(p)
@@ -180,12 +180,12 @@ func genSetter(f *File, s string, k model.Kind, isS bool) {
 	)
 }
 
-func genStructCode(s string, k model.Kind, isS bool) *Statement {
+func genStructCode(s string, ks model.KindWithSlice) *Statement {
 	i := Id(s)
-	if isS {
+	if ks.Slice {
 		i = i.Index()
 	}
-	switch k {
+	switch ks.Kind {
 	case model.JSON:
 		return i.Id(varNormalize(s))
 	case model.Bool:
@@ -208,13 +208,13 @@ func genStructJSON(s string, pkgName string, body string) (outputName string, ou
 	return
 }
 
-func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
+func genInterfaceCode(s string, ks model.KindWithSlice) *Statement {
 	funcS := varNormalize(s)
 	i := Id(funcS).Params()
-	if isS {
+	if ks.Slice {
 		i = i.Index()
 	}
-	switch k {
+	switch ks.Kind {
 	case model.JSON:
 		return i.Id(varNormalize(s))
 	case model.Bool:
@@ -228,10 +228,10 @@ func genInterfaceCode(s string, k model.Kind, isS bool) *Statement {
 	}
 }
 
-func genSetCode(s string, k model.Kind, isS bool) []Code {
+func genSetCode(s string, ks model.KindWithSlice) []Code {
 	var codes []Code
-	if isS {
-		switch k {
+	if ks.Slice {
+		switch ks.Kind {
 		case model.Bool:
 			codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 				Qual("os", "Getenv").Call(Lit(s)),
@@ -284,7 +284,7 @@ func genSetCode(s string, k model.Kind, isS bool) []Code {
 			))
 		}
 	} else {
-		switch k {
+		switch ks.Kind {
 		case model.JSON:
 			codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
 			codes = append(codes, Var().Id(s).Id(varNormalize(s)))
@@ -360,4 +360,25 @@ func varNormalize(v string) string {
 		return "UNDERLINE" + v
 	}
 	return strings.Title(v)
+}
+
+func forceTypeSetter(m map[string]string) (map[string]model.KindWithSlice, error) {
+	r := map[string]model.KindWithSlice{}
+	for i, v := range m {
+		slice := false
+		if strings.HasPrefix(v, "[]") {
+			v = v[2:]
+			slice = true
+		}
+		k, ok := model.KindSupportForceType[v]
+		if ok {
+			r[i] = model.KindWithSlice{
+				Kind:  k,
+				Slice: slice,
+			}
+		} else {
+			return r, fmt.Errorf("Unsupported Type: %s=%s", i, m[i])
+		}
+	}
+	return r, nil
 }
