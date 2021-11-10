@@ -13,48 +13,6 @@ func Test_GenerateFile(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".env.test")
 	testpackage := "envgen"
-	err := GenerateFile(testfile, testpackage, map[string]string{})
-	if err != nil {
-		t.Error(err.Error())
-	}
-	os.RemoveAll(filepath.Join(".", testpackage))
-}
-
-func Test_GenerateFile_NotExist(t *testing.T) {
-	testpackage := "envgen"
-	err := GenerateFile("", testpackage, map[string]string{})
-	if err == nil || err.Error() != "open .env: The system cannot find the file specified." {
-		t.Error("Error: Not Exist Pattern Failed")
-	}
-	os.RemoveAll(filepath.Join(".", testpackage))
-}
-
-func Test_GenerateFile_DuplicateEnvTest(t *testing.T) {
-	dir, _ := os.Getwd()
-	testfile := filepath.Join(dir, "..", "test", ".duplicate.env.test")
-	testpackage := "envgen"
-	err := GenerateFile(testfile, testpackage, map[string]string{})
-	if err == nil || err.Error() != "duplicate Env fields. duplicate_string_test:Duplicate_string_test" {
-		t.Error("duplicate validate Failed")
-	}
-	os.RemoveAll(filepath.Join(".", testpackage))
-}
-
-func Test_GenerateFile_UnderlineEnvTest(t *testing.T) {
-	dir, _ := os.Getwd()
-	testfile := filepath.Join(dir, "..", "test", ".underline.env.test")
-	testpackage := "envgen"
-	err := GenerateFile(testfile, testpackage, map[string]string{})
-	if err != nil {
-		t.Error(err.Error())
-	}
-	os.RemoveAll(filepath.Join(".", testpackage))
-}
-
-func Test_GenerateFile_ForceEnvTest(t *testing.T) {
-	dir, _ := os.Getwd()
-	testfile := filepath.Join(dir, "..", "test", ".force.env.test")
-	testpackage := "envgen"
 	err := GenerateFile(testfile, testpackage, map[string]string{
 		"FORCE_BOOL":        "bool",
 		"FORCE_INT":         "int",
@@ -85,6 +43,26 @@ func Test_GenerateFile_ForceEnvTest(t *testing.T) {
 	})
 	if err != nil {
 		t.Error(err.Error())
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
+func Test_GenerateFile_NotExist(t *testing.T) {
+	testpackage := "envgen"
+	err := GenerateFile("", testpackage, map[string]string{})
+	if err == nil || err.Error() != "open .env: The system cannot find the file specified." {
+		t.Error("Error: Not Exist Pattern Failed")
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
+func Test_GenerateFile_DuplicateEnvTest(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "test", ".duplicate.env.test")
+	testpackage := "envgen"
+	err := GenerateFile(testfile, testpackage, map[string]string{})
+	if err == nil || err.Error() != "duplicate Env fields. duplicate_string_test:Duplicate_string_test" {
+		t.Error("duplicate validate Failed")
 	}
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
