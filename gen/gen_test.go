@@ -56,13 +56,37 @@ func Test_GenerateFile_NotExist(t *testing.T) {
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
 
-func Test_GenerateFile_DuplicateEnvTest(t *testing.T) {
+func Test_GenerateFile_Empty(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "test", ".empty.env.test")
+	testpackage := "envgen"
+	err := GenerateFile(testfile, testpackage, map[string]string{})
+	if err == nil || err.Error() != "Dotenv file is empty." {
+		t.Error("Error: Not Empty Pattern Failed")
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
+func Test_GenerateFile_Duplicate(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".duplicate.env.test")
 	testpackage := "envgen"
 	err := GenerateFile(testfile, testpackage, map[string]string{})
 	if err == nil || err.Error() != "duplicate Env fields. duplicate_string_test:Duplicate_string_test" {
 		t.Error("duplicate validate Failed")
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
+func Test_GenerateFile_ForceError(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "test", ".env.test")
+	testpackage := "envgen"
+	err := GenerateFile(testfile, testpackage, map[string]string{
+		"FORCE_BOOL": "json",
+	})
+	if err == nil || err.Error() != "Unsupported Type: FORCE_BOOL=json" {
+		t.Error("Force Error Failed")
 	}
 	os.RemoveAll(filepath.Join(".", testpackage))
 }

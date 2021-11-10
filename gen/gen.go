@@ -28,6 +28,9 @@ func GenerateFile(fileName string, packageName string, forceType map[string]stri
 	if err != nil {
 		return err
 	}
+	if len(envs) == 0 {
+		return fmt.Errorf("Dotenv file is empty.")
+	}
 	files, err := Generate(envs, packageName, forceType)
 	if err != nil {
 		return err
