@@ -37,7 +37,7 @@ func setCodeSliceInt(s string, ks model.KindWithSlice) []Code {
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
 			List(Id("i"), Id("err")).Op(":=").Qual("strconv", "Atoi").Call(Id("v")),
 			If(Id("err").Op("!=").Nil()).Block(
-				Return(Id("err")),
+				Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 			),
 			Id(s).Op("=").Append(Id(s), Id("i")),
 		),
@@ -56,7 +56,7 @@ func setCodeSliceIntBits(s string, ks model.KindWithSlice, bits int) []Code {
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
 			List(Id("i"), Id("err")).Op(":=").Qual("strconv", "ParseInt").Call(Id("v"), Lit(10), Lit(bits)),
 			If(Id("err").Op("!=").Nil()).Block(
-				Return(Id("err")),
+				Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 			),
 			Id(s).Op("=").Append(Id(s), Id(fmt.Sprintf("int%d", bits)).Call(Id("i"))),
 		),
@@ -75,7 +75,7 @@ func setCodeSliceUintBits(s string, ks model.KindWithSlice, bits int) []Code {
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
 			List(Id("i"), Id("err")).Op(":=").Qual("strconv", "ParseUint").Call(Id("v"), Lit(10), Lit(bits)),
 			If(Id("err").Op("!=").Nil()).Block(
-				Return(Id("err")),
+				Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 			),
 			Id(s).Op("=").Append(Id(s), Id(fmt.Sprintf("uint%d", bits)).Call(Id("i"))),
 		),
@@ -94,7 +94,7 @@ func setCodeSliceFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
 			List(Id("i"), Id("err")).Op(":=").Qual("strconv", "ParseFloat").Call(Id("v"), Lit(bits)),
 			If(Id("err").Op("!=").Nil()).Block(
-				Return(Id("err")),
+				Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 			),
 			Id(s).Op("=").Append(Id(s), Id(fmt.Sprintf("float%d", bits)).Call(Id("i"))),
 		),
@@ -131,6 +131,9 @@ func setCodeJSON(s string, ks model.KindWithSlice) []Code {
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
 	codes = append(codes, Var().Id(s).Id(varNormalize(s)))
 	codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
+	codes = append(codes, If(Id("err").Op("!=").Nil()).Block(
+		Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
+	))
 	return codes
 }
 
@@ -152,7 +155,7 @@ func setCodeInt(s string, ks model.KindWithSlice) []Code {
 	codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "Atoi").Call(Id(s+"__S")))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
-			Return(Id("err")),
+			Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 		),
 	)
 	return codes
@@ -164,7 +167,7 @@ func setCodeIntBits(s string, ks model.KindWithSlice, bits int) []Code {
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseInt").Call(Id(s+"__S"), Lit(10), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
-			Return(Id("err")),
+			Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 		),
 	)
 	codes = append(codes, Id(s).Op(":=").Id(fmt.Sprintf("int%d", bits)).Call(Id(s+"__64")))
@@ -177,7 +180,7 @@ func setCodeUintBits(s string, ks model.KindWithSlice, bits int) []Code {
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseUint").Call(Id(s+"__S"), Lit(10), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
-			Return(Id("err")),
+			Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 		),
 	)
 	codes = append(codes, Id(s).Op(":=").Id(fmt.Sprintf("uint%d", bits)).Call(Id(s+"__64")))
@@ -190,7 +193,7 @@ func setCodeFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseFloat").Call(Id(s+"__S"), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
-			Return(Id("err")),
+			Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Id("err").Dot("Error").Call())),
 		),
 	)
 	codes = append(codes, Id(s).Op(":=").Id(fmt.Sprintf("float%d", bits)).Call(Id(s+"__64")))
