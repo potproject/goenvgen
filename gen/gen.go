@@ -17,6 +17,7 @@ import (
 	"github.com/potproject/goenvgen/model"
 )
 
+// GenerateFile is generate envgen Package from .env file.
 func GenerateFile(fileName string, packageName string, forceType map[string]string) error {
 	var envs map[string]string
 	var err error
@@ -45,6 +46,7 @@ func GenerateFile(fileName string, packageName string, forceType map[string]stri
 	return nil
 }
 
+// Generate is generate Go file map from envs.
 func Generate(envs map[string]string, packageName string, forceType map[string]string) (map[string][]byte, error) {
 	outputs := map[string][]byte{}
 
