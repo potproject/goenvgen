@@ -78,6 +78,17 @@ func Test_GenerateFile_Duplicate(t *testing.T) {
 	os.RemoveAll(filepath.Join(".", testpackage))
 }
 
+func Test_GenerateFile_Duplicate2(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "test", ".duplicate2.env.test")
+	testpackage := "envgen"
+	err := GenerateFile(testfile, testpackage, map[string]string{})
+	if err == nil || err.Error() != "duplicate Env fields. _duplicate_string_test:UNDERSCORE_duplicate_string_test" {
+		t.Error("duplicate validate Failed")
+	}
+	os.RemoveAll(filepath.Join(".", testpackage))
+}
+
 func Test_GenerateFile_ForceError(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "test", ".env.test")
@@ -112,7 +123,7 @@ func Test_isFirstLower(t *testing.T) {
 }
 
 func Test_varNormalize(t *testing.T) {
-	if varNormalize("") != "" || varNormalize("test") != "Test" || varNormalize("Test_2") != "Test_2" || varNormalize("_Test") != "UNDERLINE_Test" {
+	if varNormalize("") != "" || varNormalize("test") != "Test" || varNormalize("Test_2") != "Test_2" || varNormalize("_Test") != "UNDERSCORE_Test" {
 		t.Error("varNormalize Test Failed")
 	}
 }

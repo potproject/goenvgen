@@ -205,8 +205,8 @@ func sortedKeys(m interface{}) []string {
 func validate(keys []string) error {
 	for _, v := range keys {
 		// duplicate check
-		if isFirstLower(v) {
-			vt := strings.Title(v)
+		if isFirstLower(v) || strings.HasPrefix(v, "_") {
+			vt := varNormalize(v)
 			i := sort.SearchStrings(keys, vt)
 			if i != len(keys) && keys[i] == vt {
 				return fmt.Errorf("duplicate Env fields. %s:%s", v, vt)
@@ -229,7 +229,7 @@ func varNormalize(v string) string {
 		return ""
 	}
 	if strings.HasPrefix(v, "_") {
-		return "UNDERLINE" + v
+		return "UNDERSCORE" + v
 	}
 	return strings.Title(v)
 }
