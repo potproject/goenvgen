@@ -95,6 +95,9 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	)
 	setCode = append([]Code{Var().Id("err").Id("error")}, setCode...)
 	setCode = append(setCode, Return(Id("err")))
+
+	f.Comment("Load reads the environment variables and stores them in the env variable.")
+	f.Comment("If the type conversion fails, it returns error.")
 	f.Func().Id("Load").Params().Error().Block(
 		setCode...,
 	)
@@ -110,6 +113,9 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	)
 
 	// Get
+
+	f.Comment("Get returns a getter.")
+	f.Comment("getter is a struct for retrieving a value.")
 	f.Func().Id("Get").Params().Id("getter").Block(
 		Return().Id("getter").Block(),
 	)
@@ -125,8 +131,17 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	)
 
 	// Set
+	f.Comment("Set returns a setter.")
+	f.Comment("setter is a struct for inserting a value.")
 	f.Func().Id("Set").Params().Id("setter").Block(
 		Return().Id("setter").Block(),
+	)
+
+	// Reset
+	f.Comment("Reset will reset the env variable.")
+	f.Func().Id("Reset").Params().Block(
+		Id("env").Op("=").Id("environment").Block(),
+		Return(),
 	)
 
 	// Render...

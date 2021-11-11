@@ -440,6 +440,8 @@ type environment struct {
 
 var env environment
 
+// Load reads the environment variables and stores them in the env variable.
+// If the type conversion fails, it returns error.
 func Load() error {
 	var err error
 	BOOL_TEST1 := false
@@ -876,6 +878,8 @@ type getter struct {
 	getterInterface
 }
 
+// Get returns a getter.
+// getter is a struct for retrieving a value.
 func Get() getter {
 	return getter{}
 }
@@ -939,6 +943,14 @@ type setter struct {
 	setterInterface
 }
 
+// Set returns a setter.
+// setter is a struct for inserting a value.
 func Set() setter {
 	return setter{}
+}
+
+// Reset will reset the env variable.
+func Reset() {
+	env = environment{}
+	return
 }
