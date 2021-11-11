@@ -69,7 +69,7 @@ func Test_EnvGenTestGet(t *testing.T) {
 	if "{\"\"}" != envgentest.Get().INVALID_JSON_TEST() {
 		t.Errorf("INVALID_JSON_TEST invalid")
 	}
-	if "underline_test" != envgentest.Get().UNDERLINE_TEST() {
+	if "underscore_test" != envgentest.Get().UNDERSCORE_TEST() {
 		t.Errorf("_TEST invalid")
 	}
 	if diff := cmp.Diff([]string{"true", "100", "abc"}, envgentest.Get().S_STRING_TEST2()); diff != "" {

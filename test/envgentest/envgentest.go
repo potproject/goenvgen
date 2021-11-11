@@ -350,10 +350,10 @@ func (s setter) UPPERCASETEST(value string) {
 	env.UPPERCASETEST = value
 	return
 }
-func (g getter) UNDERLINE_TEST() string {
+func (g getter) UNDERSCORE_TEST() string {
 	return env._TEST
 }
-func (s setter) UNDERLINE_TEST(value string) {
+func (s setter) UNDERSCORE_TEST(value string) {
 	env._TEST = value
 	return
 }
@@ -832,7 +832,7 @@ type getterInterface interface {
 	S_STRING_TEST() []string
 	S_STRING_TEST2() []string
 	UPPERCASETEST() string
-	UNDERLINE_TEST() string
+	UNDERSCORE_TEST() string
 	Lower_snake_case_test() string
 	Lower_snake_case_test_json() Lower_snake_case_test_json
 	Lowercasetest() string
@@ -895,7 +895,7 @@ type setterInterface interface {
 	S_STRING_TEST() []string
 	S_STRING_TEST2() []string
 	UPPERCASETEST() string
-	UNDERLINE_TEST() string
+	UNDERSCORE_TEST() string
 	Lower_snake_case_test() string
 	Lower_snake_case_test_json() Lower_snake_case_test_json
 	Lowercasetest() string
