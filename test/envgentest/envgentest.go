@@ -446,16 +446,28 @@ func Load() error {
 	BOOL_TEST1__S := os.Getenv("BOOL_TEST1")
 	if strings.ToLower(BOOL_TEST1__S) == "true" {
 		BOOL_TEST1 = true
+	} else if strings.ToLower(BOOL_TEST1__S) == "false" {
+		BOOL_TEST1 = false
+	} else {
+		return errors.New("BOOL_TEST1: " + "cannot use " + BOOL_TEST1__S + " as type bool in assignment")
 	}
 	BOOL_TEST2 := false
 	BOOL_TEST2__S := os.Getenv("BOOL_TEST2")
 	if strings.ToLower(BOOL_TEST2__S) == "true" {
 		BOOL_TEST2 = true
+	} else if strings.ToLower(BOOL_TEST2__S) == "false" {
+		BOOL_TEST2 = false
+	} else {
+		return errors.New("BOOL_TEST2: " + "cannot use " + BOOL_TEST2__S + " as type bool in assignment")
 	}
 	BOOL_TEST3 := false
 	BOOL_TEST3__S := os.Getenv("BOOL_TEST3")
 	if strings.ToLower(BOOL_TEST3__S) == "true" {
 		BOOL_TEST3 = true
+	} else if strings.ToLower(BOOL_TEST3__S) == "false" {
+		BOOL_TEST3 = false
+	} else {
+		return errors.New("BOOL_TEST3: " + "cannot use " + BOOL_TEST3__S + " as type bool in assignment")
 	}
 	CamelCaseTest := os.Getenv("CamelCaseTest")
 	FLOAT64_TEST1__S := os.Getenv("FLOAT64_TEST1")
@@ -480,6 +492,10 @@ func Load() error {
 	FORCE_BOOL__S := os.Getenv("FORCE_BOOL")
 	if strings.ToLower(FORCE_BOOL__S) == "true" {
 		FORCE_BOOL = true
+	} else if strings.ToLower(FORCE_BOOL__S) == "false" {
+		FORCE_BOOL = false
+	} else {
+		return errors.New("FORCE_BOOL: " + "cannot use " + FORCE_BOOL__S + " as type bool in assignment")
 	}
 	FORCE_FLOAT32__S := os.Getenv("FORCE_FLOAT32")
 	FORCE_FLOAT32__64, err := strconv.ParseFloat(FORCE_FLOAT32__S, 32)
@@ -528,8 +544,10 @@ func Load() error {
 	for _, v := range FORCE_S_BOOL__A {
 		if strings.ToLower(v) == "true" {
 			FORCE_S_BOOL = append(FORCE_S_BOOL, true)
-		} else {
+		} else if strings.ToLower(v) == "false" {
 			FORCE_S_BOOL = append(FORCE_S_BOOL, false)
+		} else {
+			return errors.New("FORCE_S_BOOL: " + "cannot use " + v + " as type bool in assignment")
 		}
 	}
 	FORCE_S_FLOAT32__A := strings.Split(os.Getenv("FORCE_S_FLOAT32"), ",")
@@ -705,8 +723,10 @@ func Load() error {
 	for _, v := range S_BOOL_TEST__A {
 		if strings.ToLower(v) == "true" {
 			S_BOOL_TEST = append(S_BOOL_TEST, true)
-		} else {
+		} else if strings.ToLower(v) == "false" {
 			S_BOOL_TEST = append(S_BOOL_TEST, false)
+		} else {
+			return errors.New("S_BOOL_TEST: " + "cannot use " + v + " as type bool in assignment")
 		}
 	}
 	S_FLOAT64_TEST__A := strings.Split(os.Getenv("S_FLOAT64_TEST"), ",")

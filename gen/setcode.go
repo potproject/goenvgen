@@ -18,8 +18,10 @@ func setCodeSliceBool(s string, ks model.KindWithSlice) []Code {
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
 			If(Qual("strings", "ToLower").Call(Id("v")).Op("==").Lit("true")).Block(
 				Id(s).Op("=").Append(Id(s), Lit(true)),
-			).Else().Block(
+			).Else().If(Qual("strings", "ToLower").Call(Id("v")).Op("==").Lit("false")).Block(
 				Id(s).Op("=").Append(Id(s), Lit(false)),
+			).Else().Block(
+				Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Lit("cannot use ").Op("+").Id("v").Op("+").Lit(" as type bool in assignment"))),
 			),
 		),
 	)
@@ -144,6 +146,10 @@ func setCodeBool(s string, ks model.KindWithSlice) []Code {
 	codes = append(codes,
 		If(Qual("strings", "ToLower").Call(Id(s+"__S")).Op("==").Lit("true")).Block(
 			Id(s).Op("=").Lit(true),
+		).Else().If(Qual("strings", "ToLower").Call(Id(s+"__S")).Op("==").Lit("false")).Block(
+			Id(s).Op("=").Lit(false),
+		).Else().Block(
+			Return(Qual("errors", "New").Call(Lit(s+": ").Op("+").Lit("cannot use ").Op("+").Id(s+"__S").Op("+").Lit(" as type bool in assignment"))),
 		),
 	)
 	return codes
