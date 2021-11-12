@@ -142,6 +142,113 @@ func Test_EnvGenTestSet(t *testing.T) {
 	}
 }
 
+func Test_envgentestSetForce(t *testing.T) {
+	Set().FORCE_BOOL(true)
+	if true != Get().FORCE_BOOL() {
+		t.Errorf("FORCE_BOOL invalid")
+	}
+	Set().FORCE_INT(1)
+	if 1 != Get().FORCE_INT() {
+		t.Errorf("FORCE_INT invalid")
+	}
+	Set().FORCE_INT8(127)
+	if 127 != Get().FORCE_INT8() {
+		t.Errorf("FORCE_INT8 invalid")
+	}
+	Set().FORCE_INT16(32767)
+	if 32767 != Get().FORCE_INT16() {
+		t.Errorf("FORCE_INT16 invalid")
+	}
+	Set().FORCE_INT32(2147483647)
+	if 2147483647 != Get().FORCE_INT32() {
+		t.Errorf("FORCE_INT32 invalid")
+	}
+	Set().FORCE_INT64(0)
+	if 0 != Get().FORCE_INT64() {
+		t.Errorf("FORCE_INT64 invalid")
+	}
+	Set().FORCE_UINT8(255)
+	if 255 != Get().FORCE_UINT8() {
+		t.Errorf("FORCE_UINT8 invalid")
+	}
+	Set().FORCE_UINT16(65535)
+	if 65535 != Get().FORCE_UINT16() {
+		t.Errorf("FORCE_UINT16 invalid")
+	}
+	Set().FORCE_UINT32(4294967295)
+	if 4294967295 != Get().FORCE_UINT32() {
+		t.Errorf("FORCE_UINT32 invalid")
+	}
+	Set().FORCE_UINT64(0)
+	if 0 != Get().FORCE_UINT64() {
+		t.Errorf("FORCE_UINT64 invalid")
+	}
+	Set().FORCE_FLOAT32(0.1)
+	if 0.1 != Get().FORCE_FLOAT32() {
+		t.Errorf("FORCE_FLOAT32 invalid")
+	}
+	Set().FORCE_FLOAT64(0.01)
+	if 0.01 != Get().FORCE_FLOAT64() {
+		t.Errorf("FORCE_FLOAT64 invalid")
+	}
+	Set().FORCE_INTERFACE("interface")
+	if "interface" != Get().FORCE_INTERFACE() {
+		t.Errorf("FORCE_INTERFACE invalid")
+	}
+	Set().FORCE_S_BOOL([]bool{true, false})
+	if diff := cmp.Diff([]bool{true, false}, Get().FORCE_S_BOOL()); diff != "" {
+		t.Errorf("FORCE_S_BOOL invalid: %s", diff)
+	}
+	Set().FORCE_S_INT([]int{100, 200, 300})
+	if diff := cmp.Diff([]int{100, 200, 300}, Get().FORCE_S_INT()); diff != "" {
+		t.Errorf("FORCE_S_INT invalid: %s", diff)
+	}
+	Set().FORCE_S_INT8([]int8{16, 32, 64})
+	if diff := cmp.Diff([]int8{16, 32, 64}, Get().FORCE_S_INT8()); diff != "" {
+		t.Errorf("FORCE_S_INT8 invalid: %s", diff)
+	}
+	Set().FORCE_S_INT16([]int16{200, 400, 800})
+	if diff := cmp.Diff([]int16{200, 400, 800}, Get().FORCE_S_INT16()); diff != "" {
+		t.Errorf("FORCE_S_INT16 invalid: %s", diff)
+	}
+	Set().FORCE_S_INT32([]int32{300, 900, 2700})
+	if diff := cmp.Diff([]int32{300, 900, 2700}, Get().FORCE_S_INT32()); diff != "" {
+		t.Errorf("FORCE_S_INT32 invalid: %s", diff)
+	}
+	Set().FORCE_S_INT64([]int64{400, 1600, 6400})
+	if diff := cmp.Diff([]int64{400, 1600, 6400}, Get().FORCE_S_INT64()); diff != "" {
+		t.Errorf("FORCE_S_INT64 invalid: %s", diff)
+	}
+	Set().FORCE_S_UINT8([]uint8{2, 4, 8})
+	if diff := cmp.Diff([]uint8{2, 4, 8}, Get().FORCE_S_UINT8()); diff != "" {
+		t.Errorf("FORCE_S_UINT8 invalid: %s", diff)
+	}
+	Set().FORCE_S_UINT16([]uint16{3, 9, 27})
+	if diff := cmp.Diff([]uint16{3, 9, 27}, Get().FORCE_S_UINT16()); diff != "" {
+		t.Errorf("FORCE_S_UINT16 invalid: %s", diff)
+	}
+	Set().FORCE_S_UINT32([]uint32{4, 16, 64})
+	if diff := cmp.Diff([]uint32{4, 16, 64}, Get().FORCE_S_UINT32()); diff != "" {
+		t.Errorf("FORCE_S_UINT32 invalid: %s", diff)
+	}
+	Set().FORCE_S_UINT64([]uint64{5, 25, 125})
+	if diff := cmp.Diff([]uint64{5, 25, 125}, Get().FORCE_S_UINT64()); diff != "" {
+		t.Errorf("FORCE_S_UINT64 invalid: %s", diff)
+	}
+	Set().FORCE_S_FLOAT32([]float32{0.1, 0.01, 0.001})
+	if diff := cmp.Diff([]float32{0.1, 0.01, 0.001}, Get().FORCE_S_FLOAT32()); diff != "" {
+		t.Errorf("FORCE_S_FLOAT32 invalid: %s", diff)
+	}
+	Set().FORCE_S_FLOAT64([]float64{0.01, 0.001, 0.0001})
+	if diff := cmp.Diff([]float64{0.01, 0.001, 0.0001}, Get().FORCE_S_FLOAT64()); diff != "" {
+		t.Errorf("FORCE_S_FLOAT64 invalid: %s", diff)
+	}
+	Set().FORCE_S_INTERFACE([]interface{}{"inter", "face"})
+	if diff := cmp.Diff([]interface{}{"inter", "face"}, Get().FORCE_S_INTERFACE()); diff != "" {
+		t.Errorf("FORCE_S_INTERFACE invalid: %s", diff)
+	}
+}
+
 func Test_EnvGenTestGet(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "..", "test", ".env.test")
