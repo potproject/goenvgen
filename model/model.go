@@ -1,5 +1,6 @@
 package model
 
+// Kind is Support Types
 type Kind uint
 
 const (
@@ -10,7 +11,6 @@ const (
 	Int16
 	Int32
 	Int64
-	Uint
 	Uint8
 	Uint16
 	Uint32
@@ -22,6 +22,7 @@ const (
 	JSON
 )
 
+// KindSupportForceType is types supported by manually type definition
 var KindSupportForceType = map[string]Kind{
 	"bool":      Bool,
 	"int":       Int,
@@ -29,7 +30,6 @@ var KindSupportForceType = map[string]Kind{
 	"int16":     Int16,
 	"int32":     Int32,
 	"int64":     Int64,
-	"uint":      Uint,
 	"uint8":     Uint8,
 	"uint16":    Uint16,
 	"uint32":    Uint32,
@@ -40,6 +40,7 @@ var KindSupportForceType = map[string]Kind{
 	"string":    String,
 }
 
+// KindWithSlice is struct to determine type and slice
 type KindWithSlice struct {
 	Kind  Kind
 	Slice bool
