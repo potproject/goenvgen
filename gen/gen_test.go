@@ -50,7 +50,7 @@ func Test_GenerateFile(t *testing.T) {
 func Test_GenerateFile_NotExist(t *testing.T) {
 	testpackage := "envgen"
 	err := GenerateFile("", testpackage, map[string]string{})
-	if err == nil || err.Error() != "open .env: The system cannot find the file specified." {
+	if err == nil || err.Error() != "open .env: no such file or directory" {
 		t.Error("Error: Not Exist Pattern Failed")
 	}
 	os.RemoveAll(filepath.Join(".", testpackage))
