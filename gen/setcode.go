@@ -7,12 +7,15 @@ import (
 	"github.com/potproject/goenvgen/model"
 )
 
-func setCodeSliceBool(s string, ks model.KindWithSlice) []Code {
+func setCodeSliceBool(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Bool())
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -28,12 +31,15 @@ func setCodeSliceBool(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeSliceInt(s string, ks model.KindWithSlice) []Code {
+func setCodeSliceInt(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Int())
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -47,12 +53,15 @@ func setCodeSliceInt(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeSliceIntBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeSliceIntBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Id(fmt.Sprintf("int%d", bits)))
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -66,12 +75,15 @@ func setCodeSliceIntBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeSliceUintBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeSliceUintBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Id(fmt.Sprintf("uint%d", bits)))
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -85,12 +97,15 @@ func setCodeSliceUintBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeSliceFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeSliceFloatBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Id(fmt.Sprintf("float%d", bits)))
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -104,12 +119,15 @@ func setCodeSliceFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeSliceInterface(s string, ks model.KindWithSlice) []Code {
+func setCodeSliceInterface(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__A").Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s+"__A"))
+	}
 	codes = append(codes, Var().Id(s).Index().Interface())
 	codes = append(codes,
 		For(List(Id("_"), Id("v")).Op(":=").Range().Id(s+"__A")).Block(
@@ -119,18 +137,24 @@ func setCodeSliceInterface(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeSliceString(s string, ks model.KindWithSlice) []Code {
+func setCodeSliceString(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s).Op(":=").Qual("strings", "Split").Call(
 		Qual("os", "Getenv").Call(Lit(s)),
 		Lit(","),
 	))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequiredSlice(s, s))
+	}
 	return codes
 }
 
-func setCodeJSON(s string, ks model.KindWithSlice) []Code {
+func setCodeJSON(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes, Var().Id(s).Id(varNormalize(s)))
 	codes = append(codes, Err().Op("=").Qual("encoding/json", "Unmarshal").Call(Id("[]byte").Call(Id(s+"__S")), Op("&").Id(s)))
 	codes = append(codes, If(Id("err").Op("!=").Nil()).Block(
@@ -139,10 +163,13 @@ func setCodeJSON(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeBool(s string, ks model.KindWithSlice) []Code {
+func setCodeBool(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s).Op(":=").Lit(false))
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes,
 		If(Qual("strings", "ToLower").Call(Id(s+"__S")).Op("==").Lit("true")).Block(
 			Id(s).Op("=").Lit(true),
@@ -155,9 +182,12 @@ func setCodeBool(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeInt(s string, ks model.KindWithSlice) []Code {
+func setCodeInt(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes, List(Id(s), Err()).Op(":=").Qual("strconv", "Atoi").Call(Id(s+"__S")))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
@@ -167,9 +197,12 @@ func setCodeInt(s string, ks model.KindWithSlice) []Code {
 	return codes
 }
 
-func setCodeIntBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeIntBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseInt").Call(Id(s+"__S"), Lit(10), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
@@ -180,9 +213,12 @@ func setCodeIntBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeUintBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeUintBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseUint").Call(Id(s+"__S"), Lit(10), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
@@ -193,9 +229,12 @@ func setCodeUintBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
+func setCodeFloatBits(s string, ks model.KindWithSliceAndRequired, bits int) []Code {
 	var codes []Code
 	codes = append(codes, Id(s+"__S").Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s+"__S"))
+	}
 	codes = append(codes, List(Id(s+"__64"), Err()).Op(":=").Qual("strconv", "ParseFloat").Call(Id(s+"__S"), Lit(bits)))
 	codes = append(codes,
 		If(Id("err").Op("!=").Nil()).Block(
@@ -206,19 +245,33 @@ func setCodeFloatBits(s string, ks model.KindWithSlice, bits int) []Code {
 	return codes
 }
 
-func setCodeInterface(s string, ks model.KindWithSlice) []Code {
+func setCodeInterface(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Var().Id(s).Interface().Op("=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s))
+	}
 	return codes
 }
 
-func setCodeString(s string, ks model.KindWithSlice) []Code {
+func setCodeString(s string, ks model.KindWithSliceAndRequired) []Code {
 	var codes []Code
 	codes = append(codes, Id(s).Op(":=").Qual("os", "Getenv").Call(Lit(s)))
+	if ks.Required {
+		codes = append(codes, genSetCodeRequired(s, s))
+	}
 	return codes
 }
 
-func genSetCode(s string, ks model.KindWithSlice) []Code {
+func genSetCodeRequired(name string, varName string) Code {
+	return If(Id(varName).Op("==").Lit("")).Block(Return(Qual("errors", "New").Call(Lit(name + " is required"))))
+}
+
+func genSetCodeRequiredSlice(name string, varName string) Code {
+	return If(Id("len").Call(Id(varName)).Op("==").Lit(0)).Block(Return(Qual("errors", "New").Call(Lit(name + " is required"))))
+}
+
+func genSetCode(s string, ks model.KindWithSliceAndRequired) []Code {
 	if ks.Slice {
 		switch ks.Kind {
 		case model.Bool:

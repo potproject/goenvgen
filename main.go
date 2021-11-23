@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	pkg   = flag.String("p", "envgen", "the name of the package for the generated code")
-	types = flag.String("t", "", "Manually type definition setting (example: \"-t ENV_BOOL=bool,ENV_S_INT=[]int\")")
+	pkg      = flag.String("p", "envgen", "the name of the package for the generated code")
+	types    = flag.String("t", "", "Manually type definition setting (example: \"-t ENV_BOOL=bool,ENV_S_INT=[]int\")")
+	required = flag.String("r", "", "Required Type setting (example: \"-r ENV_REQ_BOOL,ENV_REQ_STRING\")")
 )
 
 func main() {
@@ -45,6 +46,10 @@ func run(args []string) error {
 			mapmtds[mtd[0]] = mtd[1]
 		}
 	}
-	err := gen.GenerateFile(file, *pkg, mapmtds)
+	reqs := []string{}
+	if required != nil && *required != "" {
+		reqs = strings.Split(*required, ",")
+	}
+	err := gen.GenerateFile(file, *pkg, mapmtds, reqs)
 	return err
 }

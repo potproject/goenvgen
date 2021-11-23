@@ -18,7 +18,7 @@ import (
 )
 
 // GenerateFile is generate envgen Package from .env file.
-func GenerateFile(fileName string, packageName string, forceType map[string]string) error {
+func GenerateFile(fileName string, packageName string, forceType map[string]string, requiredEnv []string) error {
 	var envs map[string]string
 	var err error
 	if fileName == "" {
@@ -32,7 +32,7 @@ func GenerateFile(fileName string, packageName string, forceType map[string]stri
 	if len(envs) == 0 {
 		return fmt.Errorf("Dotenv file is empty.")
 	}
-	files, err := Generate(envs, packageName, forceType)
+	files, err := Generate(envs, packageName, forceType, requiredEnv)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func GenerateFile(fileName string, packageName string, forceType map[string]stri
 }
 
 // Generate is generate Go file map from envs.
-func Generate(envs map[string]string, packageName string, forceType map[string]string) (map[string][]byte, error) {
+func Generate(envs map[string]string, packageName string, forceType map[string]string, requiredEnv []string) (map[string][]byte, error) {
 	outputs := map[string][]byte{}
 
 	// sort & validate
@@ -62,7 +62,7 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	f.ImportName("encoding/json", "json")
 
 	// Force Set Type
-	forceSetKind, err := forceTypeSetter(forceType)
+	k, err := TypeSetter(forceType)
 	if err != nil {
 		return outputs, err
 	}
@@ -74,9 +74,12 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	setDict := Dict{}
 	for _, i := range sortedEnvs {
 		v := envs[i]
-		ks, ok := forceSetKind[i]
+		ks, ok := k[i]
 		if !ok {
 			ks, _ = checker(v)
+		}
+		if contains(requiredEnv, i) {
+			ks.Required = true
 		}
 		if ks.Kind == model.JSON {
 			on, o := genStructJSON(i, packageName, v)
@@ -157,7 +160,7 @@ func Generate(envs map[string]string, packageName string, forceType map[string]s
 	return outputs, err
 }
 
-func genGetter(f *File, s string, ks model.KindWithSlice) {
+func genGetter(f *File, s string, ks model.KindWithSliceAndRequired) {
 	funcS := varNormalize(s)
 	i := f.Func().Params(Id("g").Id("getter")).Id(funcS).Params()
 	if ks.Slice {
@@ -169,7 +172,7 @@ func genGetter(f *File, s string, ks model.KindWithSlice) {
 	)
 }
 
-func genSetter(f *File, s string, ks model.KindWithSlice) {
+func genSetter(f *File, s string, ks model.KindWithSliceAndRequired) {
 	funcS := varNormalize(s)
 	i := f.Func().Params(Id("s").Id("setter")).Id(funcS)
 	p := Id("value")
@@ -184,7 +187,7 @@ func genSetter(f *File, s string, ks model.KindWithSlice) {
 	)
 }
 
-func genStructCode(s string, ks model.KindWithSlice) *Statement {
+func genStructCode(s string, ks model.KindWithSliceAndRequired) *Statement {
 	i := Id(s)
 	if ks.Slice {
 		i = i.Index()
@@ -203,7 +206,7 @@ func genStructJSON(s string, pkgName string, body string) (outputName string, ou
 	return
 }
 
-func genInterfaceCode(s string, ks model.KindWithSlice) *Statement {
+func genInterfaceCode(s string, ks model.KindWithSliceAndRequired) *Statement {
 	funcS := varNormalize(s)
 	i := Id(funcS).Params()
 	if ks.Slice {
@@ -254,8 +257,8 @@ func varNormalize(v string) string {
 	return strings.Title(v)
 }
 
-func forceTypeSetter(m map[string]string) (map[string]model.KindWithSlice, error) {
-	r := map[string]model.KindWithSlice{}
+func TypeSetter(m map[string]string) (map[string]model.KindWithSliceAndRequired, error) {
+	r := map[string]model.KindWithSliceAndRequired{}
 	for i, v := range m {
 		slice := false
 		if strings.HasPrefix(v, "[]") {
@@ -264,7 +267,7 @@ func forceTypeSetter(m map[string]string) (map[string]model.KindWithSlice, error
 		}
 		k, ok := model.KindSupportForceType[v]
 		if ok {
-			r[i] = model.KindWithSlice{
+			r[i] = model.KindWithSliceAndRequired{
 				Kind:  k,
 				Slice: slice,
 			}
@@ -275,7 +278,7 @@ func forceTypeSetter(m map[string]string) (map[string]model.KindWithSlice, error
 	return r, nil
 }
 
-func kindToStatement(s string, ks model.KindWithSlice, i *Statement) *Statement {
+func kindToStatement(s string, ks model.KindWithSliceAndRequired, i *Statement) *Statement {
 	switch ks.Kind {
 	case model.Bool:
 		return i.Bool()
@@ -308,4 +311,13 @@ func kindToStatement(s string, ks model.KindWithSlice, i *Statement) *Statement 
 	default:
 		return i.String()
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

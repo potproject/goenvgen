@@ -290,6 +290,132 @@ func (s setter) JSON_TEST3(value JSON_TEST3) {
 	env.JSON_TEST3 = value
 	return
 }
+func (g getter) R_BOOL_TEST() bool {
+	return env.R_BOOL_TEST
+}
+func (s setter) R_BOOL_TEST(value bool) {
+	env.R_BOOL_TEST = value
+	return
+}
+func (g getter) R_FLOAT64_TEST() float64 {
+	return env.R_FLOAT64_TEST
+}
+func (s setter) R_FLOAT64_TEST(value float64) {
+	env.R_FLOAT64_TEST = value
+	return
+}
+func (g getter) R_FORCE_INT() int {
+	return env.R_FORCE_INT
+}
+func (s setter) R_FORCE_INT(value int) {
+	env.R_FORCE_INT = value
+	return
+}
+func (g getter) R_FORCE_INT8() int8 {
+	return env.R_FORCE_INT8
+}
+func (s setter) R_FORCE_INT8(value int8) {
+	env.R_FORCE_INT8 = value
+	return
+}
+func (g getter) R_FORCE_INTERFACE() interface{} {
+	return env.R_FORCE_INTERFACE
+}
+func (s setter) R_FORCE_INTERFACE(value interface{}) {
+	env.R_FORCE_INTERFACE = value
+	return
+}
+func (g getter) R_FORCE_S_FLOAT64() []float64 {
+	return env.R_FORCE_S_FLOAT64
+}
+func (s setter) R_FORCE_S_FLOAT64(value []float64) {
+	env.R_FORCE_S_FLOAT64 = value
+	return
+}
+func (g getter) R_FORCE_S_INT() []int {
+	return env.R_FORCE_S_INT
+}
+func (s setter) R_FORCE_S_INT(value []int) {
+	env.R_FORCE_S_INT = value
+	return
+}
+func (g getter) R_FORCE_S_INT8() []int8 {
+	return env.R_FORCE_S_INT8
+}
+func (s setter) R_FORCE_S_INT8(value []int8) {
+	env.R_FORCE_S_INT8 = value
+	return
+}
+func (g getter) R_FORCE_S_INTERFACE() []interface{} {
+	return env.R_FORCE_S_INTERFACE
+}
+func (s setter) R_FORCE_S_INTERFACE(value []interface{}) {
+	env.R_FORCE_S_INTERFACE = value
+	return
+}
+func (g getter) R_FORCE_S_UINT8() []uint8 {
+	return env.R_FORCE_S_UINT8
+}
+func (s setter) R_FORCE_S_UINT8(value []uint8) {
+	env.R_FORCE_S_UINT8 = value
+	return
+}
+func (g getter) R_FORCE_UINT8() uint8 {
+	return env.R_FORCE_UINT8
+}
+func (s setter) R_FORCE_UINT8(value uint8) {
+	env.R_FORCE_UINT8 = value
+	return
+}
+func (g getter) R_INT64_TEST() int64 {
+	return env.R_INT64_TEST
+}
+func (s setter) R_INT64_TEST(value int64) {
+	env.R_INT64_TEST = value
+	return
+}
+func (g getter) R_JSON_TEST() R_JSON_TEST {
+	return env.R_JSON_TEST
+}
+func (s setter) R_JSON_TEST(value R_JSON_TEST) {
+	env.R_JSON_TEST = value
+	return
+}
+func (g getter) R_STRING_TEST() string {
+	return env.R_STRING_TEST
+}
+func (s setter) R_STRING_TEST(value string) {
+	env.R_STRING_TEST = value
+	return
+}
+func (g getter) SR_BOOL_TEST() []bool {
+	return env.SR_BOOL_TEST
+}
+func (s setter) SR_BOOL_TEST(value []bool) {
+	env.SR_BOOL_TEST = value
+	return
+}
+func (g getter) SR_FLOAT64_TEST() []float64 {
+	return env.SR_FLOAT64_TEST
+}
+func (s setter) SR_FLOAT64_TEST(value []float64) {
+	env.SR_FLOAT64_TEST = value
+	return
+}
+func (g getter) SR_INT64_TEST() []int64 {
+	return env.SR_INT64_TEST
+}
+func (s setter) SR_INT64_TEST(value []int64) {
+	env.SR_INT64_TEST = value
+	return
+}
+func (g getter) SR_STRING_TEST() []string {
+	return env.SR_STRING_TEST
+}
+func (s setter) SR_STRING_TEST(value []string) {
+	env.SR_STRING_TEST = value
+	return
+}
 func (g getter) STRING_TEST1() string {
 	return env.STRING_TEST1
 }
@@ -423,6 +549,24 @@ type environment struct {
 	JSON_TEST                  JSON_TEST
 	JSON_TEST2                 JSON_TEST2
 	JSON_TEST3                 JSON_TEST3
+	R_BOOL_TEST                bool
+	R_FLOAT64_TEST             float64
+	R_FORCE_INT                int
+	R_FORCE_INT8               int8
+	R_FORCE_INTERFACE          interface{}
+	R_FORCE_S_FLOAT64          []float64
+	R_FORCE_S_INT              []int
+	R_FORCE_S_INT8             []int8
+	R_FORCE_S_INTERFACE        []interface{}
+	R_FORCE_S_UINT8            []uint8
+	R_FORCE_UINT8              uint8
+	R_INT64_TEST               int64
+	R_JSON_TEST                R_JSON_TEST
+	R_STRING_TEST              string
+	SR_BOOL_TEST               []bool
+	SR_FLOAT64_TEST            []float64
+	SR_INT64_TEST              []int64
+	SR_STRING_TEST             []string
 	STRING_TEST1               string
 	STRING_TEST2               string
 	STRING_TEST3               string
@@ -717,6 +861,177 @@ func Load() error {
 	if err != nil {
 		return errors.New("JSON_TEST3: " + err.Error())
 	}
+	R_BOOL_TEST := false
+	R_BOOL_TEST__S := os.Getenv("R_BOOL_TEST")
+	if R_BOOL_TEST__S == "" {
+		return errors.New("R_BOOL_TEST is required")
+	}
+	if strings.ToLower(R_BOOL_TEST__S) == "true" {
+		R_BOOL_TEST = true
+	} else if strings.ToLower(R_BOOL_TEST__S) == "false" {
+		R_BOOL_TEST = false
+	} else {
+		return errors.New("R_BOOL_TEST: " + "cannot use " + R_BOOL_TEST__S + " as type bool in assignment")
+	}
+	R_FLOAT64_TEST__S := os.Getenv("R_FLOAT64_TEST")
+	if R_FLOAT64_TEST__S == "" {
+		return errors.New("R_FLOAT64_TEST is required")
+	}
+	R_FLOAT64_TEST__64, err := strconv.ParseFloat(R_FLOAT64_TEST__S, 64)
+	if err != nil {
+		return errors.New("R_FLOAT64_TEST: " + err.Error())
+	}
+	R_FLOAT64_TEST := float64(R_FLOAT64_TEST__64)
+	R_FORCE_INT__S := os.Getenv("R_FORCE_INT")
+	if R_FORCE_INT__S == "" {
+		return errors.New("R_FORCE_INT is required")
+	}
+	R_FORCE_INT, err := strconv.Atoi(R_FORCE_INT__S)
+	if err != nil {
+		return errors.New("R_FORCE_INT: " + err.Error())
+	}
+	R_FORCE_INT8__S := os.Getenv("R_FORCE_INT8")
+	if R_FORCE_INT8__S == "" {
+		return errors.New("R_FORCE_INT8 is required")
+	}
+	R_FORCE_INT8__64, err := strconv.ParseInt(R_FORCE_INT8__S, 10, 8)
+	if err != nil {
+		return errors.New("R_FORCE_INT8: " + err.Error())
+	}
+	R_FORCE_INT8 := int8(R_FORCE_INT8__64)
+	var R_FORCE_INTERFACE interface{} = os.Getenv("R_FORCE_INTERFACE")
+	if R_FORCE_INTERFACE == "" {
+		return errors.New("R_FORCE_INTERFACE is required")
+	}
+	R_FORCE_S_FLOAT64__A := strings.Split(os.Getenv("R_FORCE_S_FLOAT64"), ",")
+	if len(R_FORCE_S_FLOAT64__A) == 0 {
+		return errors.New("R_FORCE_S_FLOAT64 is required")
+	}
+	var R_FORCE_S_FLOAT64 []float64
+	for _, v := range R_FORCE_S_FLOAT64__A {
+		i, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			return errors.New("R_FORCE_S_FLOAT64: " + err.Error())
+		}
+		R_FORCE_S_FLOAT64 = append(R_FORCE_S_FLOAT64, float64(i))
+	}
+	R_FORCE_S_INT__A := strings.Split(os.Getenv("R_FORCE_S_INT"), ",")
+	if len(R_FORCE_S_INT__A) == 0 {
+		return errors.New("R_FORCE_S_INT is required")
+	}
+	var R_FORCE_S_INT []int
+	for _, v := range R_FORCE_S_INT__A {
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			return errors.New("R_FORCE_S_INT: " + err.Error())
+		}
+		R_FORCE_S_INT = append(R_FORCE_S_INT, i)
+	}
+	R_FORCE_S_INT8__A := strings.Split(os.Getenv("R_FORCE_S_INT8"), ",")
+	if len(R_FORCE_S_INT8__A) == 0 {
+		return errors.New("R_FORCE_S_INT8 is required")
+	}
+	var R_FORCE_S_INT8 []int8
+	for _, v := range R_FORCE_S_INT8__A {
+		i, err := strconv.ParseInt(v, 10, 8)
+		if err != nil {
+			return errors.New("R_FORCE_S_INT8: " + err.Error())
+		}
+		R_FORCE_S_INT8 = append(R_FORCE_S_INT8, int8(i))
+	}
+	R_FORCE_S_INTERFACE__A := strings.Split(os.Getenv("R_FORCE_S_INTERFACE"), ",")
+	if len(R_FORCE_S_INTERFACE__A) == 0 {
+		return errors.New("R_FORCE_S_INTERFACE is required")
+	}
+	var R_FORCE_S_INTERFACE []interface{}
+	for _, v := range R_FORCE_S_INTERFACE__A {
+		R_FORCE_S_INTERFACE = append(R_FORCE_S_INTERFACE, v)
+	}
+	R_FORCE_S_UINT8__A := strings.Split(os.Getenv("R_FORCE_S_UINT8"), ",")
+	if len(R_FORCE_S_UINT8__A) == 0 {
+		return errors.New("R_FORCE_S_UINT8 is required")
+	}
+	var R_FORCE_S_UINT8 []uint8
+	for _, v := range R_FORCE_S_UINT8__A {
+		i, err := strconv.ParseUint(v, 10, 8)
+		if err != nil {
+			return errors.New("R_FORCE_S_UINT8: " + err.Error())
+		}
+		R_FORCE_S_UINT8 = append(R_FORCE_S_UINT8, uint8(i))
+	}
+	R_FORCE_UINT8__S := os.Getenv("R_FORCE_UINT8")
+	if R_FORCE_UINT8__S == "" {
+		return errors.New("R_FORCE_UINT8 is required")
+	}
+	R_FORCE_UINT8__64, err := strconv.ParseUint(R_FORCE_UINT8__S, 10, 8)
+	if err != nil {
+		return errors.New("R_FORCE_UINT8: " + err.Error())
+	}
+	R_FORCE_UINT8 := uint8(R_FORCE_UINT8__64)
+	R_INT64_TEST__S := os.Getenv("R_INT64_TEST")
+	if R_INT64_TEST__S == "" {
+		return errors.New("R_INT64_TEST is required")
+	}
+	R_INT64_TEST__64, err := strconv.ParseInt(R_INT64_TEST__S, 10, 64)
+	if err != nil {
+		return errors.New("R_INT64_TEST: " + err.Error())
+	}
+	R_INT64_TEST := int64(R_INT64_TEST__64)
+	R_JSON_TEST__S := os.Getenv("R_JSON_TEST")
+	if R_JSON_TEST__S == "" {
+		return errors.New("R_JSON_TEST is required")
+	}
+	var R_JSON_TEST R_JSON_TEST
+	err = json.Unmarshal([]byte(R_JSON_TEST__S), &R_JSON_TEST)
+	if err != nil {
+		return errors.New("R_JSON_TEST: " + err.Error())
+	}
+	R_STRING_TEST := os.Getenv("R_STRING_TEST")
+	if R_STRING_TEST == "" {
+		return errors.New("R_STRING_TEST is required")
+	}
+	SR_BOOL_TEST__A := strings.Split(os.Getenv("SR_BOOL_TEST"), ",")
+	if len(SR_BOOL_TEST__A) == 0 {
+		return errors.New("SR_BOOL_TEST is required")
+	}
+	var SR_BOOL_TEST []bool
+	for _, v := range SR_BOOL_TEST__A {
+		if strings.ToLower(v) == "true" {
+			SR_BOOL_TEST = append(SR_BOOL_TEST, true)
+		} else if strings.ToLower(v) == "false" {
+			SR_BOOL_TEST = append(SR_BOOL_TEST, false)
+		} else {
+			return errors.New("SR_BOOL_TEST: " + "cannot use " + v + " as type bool in assignment")
+		}
+	}
+	SR_FLOAT64_TEST__A := strings.Split(os.Getenv("SR_FLOAT64_TEST"), ",")
+	if len(SR_FLOAT64_TEST__A) == 0 {
+		return errors.New("SR_FLOAT64_TEST is required")
+	}
+	var SR_FLOAT64_TEST []float64
+	for _, v := range SR_FLOAT64_TEST__A {
+		i, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			return errors.New("SR_FLOAT64_TEST: " + err.Error())
+		}
+		SR_FLOAT64_TEST = append(SR_FLOAT64_TEST, float64(i))
+	}
+	SR_INT64_TEST__A := strings.Split(os.Getenv("SR_INT64_TEST"), ",")
+	if len(SR_INT64_TEST__A) == 0 {
+		return errors.New("SR_INT64_TEST is required")
+	}
+	var SR_INT64_TEST []int64
+	for _, v := range SR_INT64_TEST__A {
+		i, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return errors.New("SR_INT64_TEST: " + err.Error())
+		}
+		SR_INT64_TEST = append(SR_INT64_TEST, int64(i))
+	}
+	SR_STRING_TEST := strings.Split(os.Getenv("SR_STRING_TEST"), ",")
+	if len(SR_STRING_TEST) == 0 {
+		return errors.New("SR_STRING_TEST is required")
+	}
 	STRING_TEST1 := os.Getenv("STRING_TEST1")
 	STRING_TEST2 := os.Getenv("STRING_TEST2")
 	STRING_TEST3 := os.Getenv("STRING_TEST3")
@@ -802,6 +1117,24 @@ func Load() error {
 		JSON_TEST:                  JSON_TEST,
 		JSON_TEST2:                 JSON_TEST2,
 		JSON_TEST3:                 JSON_TEST3,
+		R_BOOL_TEST:                R_BOOL_TEST,
+		R_FLOAT64_TEST:             R_FLOAT64_TEST,
+		R_FORCE_INT:                R_FORCE_INT,
+		R_FORCE_INT8:               R_FORCE_INT8,
+		R_FORCE_INTERFACE:          R_FORCE_INTERFACE,
+		R_FORCE_S_FLOAT64:          R_FORCE_S_FLOAT64,
+		R_FORCE_S_INT:              R_FORCE_S_INT,
+		R_FORCE_S_INT8:             R_FORCE_S_INT8,
+		R_FORCE_S_INTERFACE:        R_FORCE_S_INTERFACE,
+		R_FORCE_S_UINT8:            R_FORCE_S_UINT8,
+		R_FORCE_UINT8:              R_FORCE_UINT8,
+		R_INT64_TEST:               R_INT64_TEST,
+		R_JSON_TEST:                R_JSON_TEST,
+		R_STRING_TEST:              R_STRING_TEST,
+		SR_BOOL_TEST:               SR_BOOL_TEST,
+		SR_FLOAT64_TEST:            SR_FLOAT64_TEST,
+		SR_INT64_TEST:              SR_INT64_TEST,
+		SR_STRING_TEST:             SR_STRING_TEST,
 		STRING_TEST1:               STRING_TEST1,
 		STRING_TEST2:               STRING_TEST2,
 		STRING_TEST3:               STRING_TEST3,
@@ -860,6 +1193,24 @@ type getterInterface interface {
 	JSON_TEST() JSON_TEST
 	JSON_TEST2() JSON_TEST2
 	JSON_TEST3() JSON_TEST3
+	R_BOOL_TEST() bool
+	R_FLOAT64_TEST() float64
+	R_FORCE_INT() int
+	R_FORCE_INT8() int8
+	R_FORCE_INTERFACE() interface{}
+	R_FORCE_S_FLOAT64() []float64
+	R_FORCE_S_INT() []int
+	R_FORCE_S_INT8() []int8
+	R_FORCE_S_INTERFACE() []interface{}
+	R_FORCE_S_UINT8() []uint8
+	R_FORCE_UINT8() uint8
+	R_INT64_TEST() int64
+	R_JSON_TEST() R_JSON_TEST
+	R_STRING_TEST() string
+	SR_BOOL_TEST() []bool
+	SR_FLOAT64_TEST() []float64
+	SR_INT64_TEST() []int64
+	SR_STRING_TEST() []string
 	STRING_TEST1() string
 	STRING_TEST2() string
 	STRING_TEST3() string
@@ -925,6 +1276,24 @@ type setterInterface interface {
 	JSON_TEST() JSON_TEST
 	JSON_TEST2() JSON_TEST2
 	JSON_TEST3() JSON_TEST3
+	R_BOOL_TEST() bool
+	R_FLOAT64_TEST() float64
+	R_FORCE_INT() int
+	R_FORCE_INT8() int8
+	R_FORCE_INTERFACE() interface{}
+	R_FORCE_S_FLOAT64() []float64
+	R_FORCE_S_INT() []int
+	R_FORCE_S_INT8() []int8
+	R_FORCE_S_INTERFACE() []interface{}
+	R_FORCE_S_UINT8() []uint8
+	R_FORCE_UINT8() uint8
+	R_INT64_TEST() int64
+	R_JSON_TEST() R_JSON_TEST
+	R_STRING_TEST() string
+	SR_BOOL_TEST() []bool
+	SR_FLOAT64_TEST() []float64
+	SR_INT64_TEST() []int64
+	SR_STRING_TEST() []string
 	STRING_TEST1() string
 	STRING_TEST2() string
 	STRING_TEST3() string

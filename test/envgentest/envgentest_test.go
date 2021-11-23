@@ -249,6 +249,80 @@ func Test_envgentestSetForce(t *testing.T) {
 	}
 }
 
+func Test_envgentestSetRequired(t *testing.T) {
+	Set().R_STRING_TEST("s")
+	if "s" != Get().R_STRING_TEST() {
+		t.Errorf("R_STRING_TEST invalid")
+	}
+	Set().R_INT64_TEST(1)
+	if 1 != Get().R_INT64_TEST() {
+		t.Errorf("R_INT64_TEST invalid")
+	}
+	Set().R_FLOAT64_TEST(0.1)
+	if 0.1 != Get().R_FLOAT64_TEST() {
+		t.Errorf("R_FLOAT64_TEST invalid")
+	}
+	Set().R_BOOL_TEST(true)
+	if true != Get().R_BOOL_TEST() {
+		t.Errorf("R_BOOL_TEST invalid")
+	}
+	Set().R_JSON_TEST(R_JSON_TEST{})
+	if diff := cmp.Diff(R_JSON_TEST{}, Get().R_JSON_TEST()); diff != "" {
+		t.Errorf("R_JSON_TEST invalid: %s", diff)
+	}
+	Set().SR_STRING_TEST([]string{"s", "r"})
+	if diff := cmp.Diff([]string{"s", "r"}, Get().SR_STRING_TEST()); diff != "" {
+		t.Errorf("SR_STRING_TEST invalid: %s", diff)
+	}
+	Set().SR_INT64_TEST([]int64{1, 10})
+	if diff := cmp.Diff([]int64{1, 10}, Get().SR_INT64_TEST()); diff != "" {
+		t.Errorf("SR_INT64_TEST invalid: %s", diff)
+	}
+	Set().SR_FLOAT64_TEST([]float64{0.1, 0.01})
+	if diff := cmp.Diff([]float64{0.1, 0.01}, Get().SR_FLOAT64_TEST()); diff != "" {
+		t.Errorf("SR_FLOAT64_TEST invalid: %s", diff)
+	}
+	Set().SR_BOOL_TEST([]bool{true, true})
+	if diff := cmp.Diff([]bool{true, true}, Get().SR_BOOL_TEST()); diff != "" {
+		t.Errorf("SR_BOOL_TEST invalid: %s", diff)
+	}
+	Set().R_FORCE_INTERFACE("1")
+	if "1" != Get().R_FORCE_INTERFACE() {
+		t.Errorf("R_FORCE_INTERFACE invalid")
+	}
+	Set().R_FORCE_UINT8(2)
+	if 2 != Get().R_FORCE_UINT8() {
+		t.Errorf("R_FORCE_UINT8 invalid")
+	}
+	Set().R_FORCE_INT8(3)
+	if 3 != Get().R_FORCE_INT8() {
+		t.Errorf("R_FORCE_INT8 invalid")
+	}
+	Set().R_FORCE_INT(4)
+	if 4 != Get().R_FORCE_INT() {
+		t.Errorf("R_FORCE_INT invalid")
+	}
+	Set().R_FORCE_S_INTERFACE([]interface{}{"1"})
+	if diff := cmp.Diff([]interface{}{"1"}, Get().R_FORCE_S_INTERFACE()); diff != "" {
+		t.Errorf("R_FORCE_S_INTERFACE invalid: %s", diff)
+	}
+	Set().R_FORCE_S_UINT8([]uint8{1, 2})
+	if diff := cmp.Diff([]uint8{1, 2}, Get().R_FORCE_S_UINT8()); diff != "" {
+		t.Errorf("R_FORCE_S_UINT8 invalid: %s", diff)
+	}
+	Set().R_FORCE_S_INT8([]int8{1, 2, 3})
+	if diff := cmp.Diff([]int8{1, 2, 3}, Get().R_FORCE_S_INT8()); diff != "" {
+		t.Errorf("R_FORCE_S_INT8 invalid: %s", diff)
+	}
+	Set().R_FORCE_S_INT([]int{1, 2, 3, 4})
+	if diff := cmp.Diff([]int{1, 2, 3, 4}, Get().R_FORCE_S_INT()); diff != "" {
+		t.Errorf("R_FORCE_S_INT invalid: %s", diff)
+	}
+	Set().R_FORCE_S_FLOAT64([]float64{1, 2, 3, 4, 5})
+	if diff := cmp.Diff([]float64{1, 2, 3, 4, 5}, Get().R_FORCE_S_FLOAT64()); diff != "" {
+		t.Errorf("R_FORCE_S_FLOAT64 invalid: %s", diff)
+	}
+}
 func Test_EnvGenTestGet(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "..", "test", ".env.test")
@@ -448,6 +522,69 @@ func Test_envgentestGetForce(t *testing.T) {
 	}
 }
 
+func Test_envgentestGetRequired(t *testing.T) {
+	dir, _ := os.Getwd()
+	testfile := filepath.Join(dir, "..", "..", "test", ".env.test")
+	godotenv.Load(testfile)
+	err := Load()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if "s" != Get().R_STRING_TEST() {
+		t.Errorf("R_STRING_TEST invalid")
+	}
+	if 1 != Get().R_INT64_TEST() {
+		t.Errorf("R_INT64_TEST invalid")
+	}
+	if 0.1 != Get().R_FLOAT64_TEST() {
+		t.Errorf("R_FLOAT64_TEST invalid")
+	}
+	if true != Get().R_BOOL_TEST() {
+		t.Errorf("R_BOOL_TEST invalid")
+	}
+	if diff := cmp.Diff(R_JSON_TEST{}, Get().R_JSON_TEST()); diff != "" {
+		t.Errorf("R_JSON_TEST invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]string{"s", "r"}, Get().SR_STRING_TEST()); diff != "" {
+		t.Errorf("SR_STRING_TEST invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]int64{1, 10}, Get().SR_INT64_TEST()); diff != "" {
+		t.Errorf("SR_INT64_TEST invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]float64{0.1, 0.01}, Get().SR_FLOAT64_TEST()); diff != "" {
+		t.Errorf("SR_FLOAT64_TEST invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]bool{true, true}, Get().SR_BOOL_TEST()); diff != "" {
+		t.Errorf("SR_BOOL_TEST invalid: %s", diff)
+	}
+	if "1" != Get().R_FORCE_INTERFACE() {
+		t.Errorf("R_FORCE_INTERFACE invalid")
+	}
+	if 2 != Get().R_FORCE_UINT8() {
+		t.Errorf("R_FORCE_UINT8 invalid")
+	}
+	if 3 != Get().R_FORCE_INT8() {
+		t.Errorf("R_FORCE_INT8 invalid")
+	}
+	if 4 != Get().R_FORCE_INT() {
+		t.Errorf("R_FORCE_INT invalid")
+	}
+	if diff := cmp.Diff([]interface{}{"1"}, Get().R_FORCE_S_INTERFACE()); diff != "" {
+		t.Errorf("R_FORCE_S_INTERFACE invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]uint8{1, 2}, Get().R_FORCE_S_UINT8()); diff != "" {
+		t.Errorf("R_FORCE_S_UINT8 invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]int8{1, 2, 3}, Get().R_FORCE_S_INT8()); diff != "" {
+		t.Errorf("R_FORCE_S_INT8 invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]int{1, 2, 3, 4}, Get().R_FORCE_S_INT()); diff != "" {
+		t.Errorf("R_FORCE_S_INT invalid: %s", diff)
+	}
+	if diff := cmp.Diff([]float64{1, 2, 3, 4, 5}, Get().R_FORCE_S_FLOAT64()); diff != "" {
+		t.Errorf("R_FORCE_S_FLOAT64 invalid: %s", diff)
+	}
+}
 func Test_EnvGenTestReset(t *testing.T) {
 	dir, _ := os.Getwd()
 	testfile := filepath.Join(dir, "..", "..", "test", ".env.test")

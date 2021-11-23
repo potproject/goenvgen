@@ -40,8 +40,9 @@ var KindSupportForceType = map[string]Kind{
 	"string":    String,
 }
 
-// KindWithSlice is struct to determine type and slice
-type KindWithSlice struct {
-	Kind  Kind
-	Slice bool
+// KindWithSliceAndRequired is struct to determine type and slice and required
+type KindWithSliceAndRequired struct {
+	Kind     Kind
+	Slice    bool
+	Required bool
 }
