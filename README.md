@@ -1,4 +1,5 @@
-# goenvgen
+# goenvgen [![Go](https://github.com/potproject/goenvgen/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/potproject/goenvgen/actions/workflows/go.yml) [![codecov](https://codecov.io/gh/potproject/goenvgen/branch/master/graph/badge.svg?token=FWVQKED8BO)](https://codecov.io/gh/potproject/goenvgen) [![Go Report Card](https://goreportcard.com/badge/github.com/potproject/goenvgen)](https://goreportcard.com/report/github.com/potproject/goenvgen)
+
 Automatically generate Go Code from dotenv files.
 
 This cli automatically determines the type information from the dotenv information and generates a Go package that can retrieve it.
