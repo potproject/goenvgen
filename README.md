@@ -160,8 +160,14 @@ BASE_HOST is required
 
 Contributions are most welcome!
 
-```
+```bash
 $ git clone https://https://github.com/potproject/goenvgen.git
+
+# Code Generating Test
+$ cd test
+$ vi .env.test # Change .env.test File
+$ go run main.go
+$ go test ./envgentest/
 ```
 
 ## License
