@@ -24,6 +24,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
+	fmt.Println("Generated " + *pkg + " Packages.")
 	os.Exit(0)
 }
 
