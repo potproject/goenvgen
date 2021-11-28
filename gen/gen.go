@@ -257,6 +257,7 @@ func varNormalize(v string) string {
 	return strings.Title(v)
 }
 
+// TypeSetter is Manual determination of type setting
 func TypeSetter(m map[string]string) (map[string]model.KindWithSliceAndRequired, error) {
 	r := map[string]model.KindWithSliceAndRequired{}
 	for i, v := range m {

@@ -1,6 +1,6 @@
 module github.com/potproject/goenvgen
 
-go 1.15
+go 1.17
 
 require (
 	github.com/ChimeraCoder/gojson v1.1.0

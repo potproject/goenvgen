@@ -165,11 +165,11 @@ func Test_forceTypeSetter(t *testing.T) {
 		"ENV_INTERFACE": "interface",
 	}
 	expect := map[string]model.KindWithSliceAndRequired{
-		"ENV_BOOL":      model.KindWithSliceAndRequired{Kind: model.Bool, Slice: false},
-		"ENV_INT8":      model.KindWithSliceAndRequired{Kind: model.Int8, Slice: false},
-		"ENV_STRING":    model.KindWithSliceAndRequired{Kind: model.String, Slice: false},
-		"ENV_UINT64":    model.KindWithSliceAndRequired{Kind: model.Uint64, Slice: false},
-		"ENV_INTERFACE": model.KindWithSliceAndRequired{Kind: model.Interface, Slice: false},
+		"ENV_BOOL":      {Kind: model.Bool, Slice: false},
+		"ENV_INT8":      {Kind: model.Int8, Slice: false},
+		"ENV_STRING":    {Kind: model.String, Slice: false},
+		"ENV_UINT64":    {Kind: model.Uint64, Slice: false},
+		"ENV_INTERFACE": {Kind: model.Interface, Slice: false},
 	}
 	actual, err := TypeSetter(m)
 	if err != nil {
@@ -189,11 +189,11 @@ func Test_forceTypeSetterSlice(t *testing.T) {
 		"ENV_S_INTERFACE": "[]interface",
 	}
 	expect := map[string]model.KindWithSliceAndRequired{
-		"ENV_S_BOOL":      model.KindWithSliceAndRequired{Kind: model.Bool, Slice: true},
-		"ENV_S_INT8":      model.KindWithSliceAndRequired{Kind: model.Int8, Slice: true},
-		"ENV_S_STRING":    model.KindWithSliceAndRequired{Kind: model.String, Slice: true},
-		"ENV_S_UINT64":    model.KindWithSliceAndRequired{Kind: model.Uint64, Slice: true},
-		"ENV_S_INTERFACE": model.KindWithSliceAndRequired{Kind: model.Interface, Slice: true},
+		"ENV_S_BOOL":      {Kind: model.Bool, Slice: true},
+		"ENV_S_INT8":      {Kind: model.Int8, Slice: true},
+		"ENV_S_STRING":    {Kind: model.String, Slice: true},
+		"ENV_S_UINT64":    {Kind: model.Uint64, Slice: true},
+		"ENV_S_INTERFACE": {Kind: model.Interface, Slice: true},
 	}
 	actual, err := TypeSetter(m)
 	if err != nil {
