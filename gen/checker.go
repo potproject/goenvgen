@@ -35,7 +35,7 @@ func jsonChecker(text string) (model.Kind, interface{}) {
 	m := model.Invalid
 	var i interface{}
 	textt := strings.TrimSpace(text)
-	if strings.HasPrefix(textt, "{") && strings.HasSuffix(textt, "}") {
+	if (strings.HasPrefix(textt, "{") && strings.HasSuffix(textt, "}")) || (strings.HasPrefix(textt, "[") && strings.HasSuffix(textt, "]")) {
 		err := json.Unmarshal([]byte(text), &i)
 		if err == nil {
 			m = model.JSON

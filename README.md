@@ -101,6 +101,16 @@ Enjoy Development!
 
 ## Details
 
+```
+Usage of envgen:
+  -p string
+        the name of the package for the generated code (default "envgen")
+  -r string
+        Required Type setting (example: "-r ENV_REQ_BOOL,ENV_REQ_STRING")
+  -t string
+        Manually type definition setting (example: "-t ENV_BOOL=bool,ENV_S_INT=[]int")
+```
+
 ### Automatic determination of type
 
 At the time of code generation, the type is automatically assigned from the values in the .env file.

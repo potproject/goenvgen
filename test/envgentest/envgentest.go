@@ -290,6 +290,13 @@ func (s setter) JSON_TEST3(value JSON_TEST3) {
 	env.JSON_TEST3 = value
 	return
 }
+func (g getter) JSON_TEST4() JSON_TEST4 {
+	return env.JSON_TEST4
+}
+func (s setter) JSON_TEST4(value JSON_TEST4) {
+	env.JSON_TEST4 = value
+	return
+}
 func (g getter) R_BOOL_TEST() bool {
 	return env.R_BOOL_TEST
 }
@@ -549,6 +556,7 @@ type environment struct {
 	JSON_TEST                  JSON_TEST
 	JSON_TEST2                 JSON_TEST2
 	JSON_TEST3                 JSON_TEST3
+	JSON_TEST4                 JSON_TEST4
 	R_BOOL_TEST                bool
 	R_FLOAT64_TEST             float64
 	R_FORCE_INT                int
@@ -861,6 +869,12 @@ func Load() error {
 	if err != nil {
 		return errors.New("JSON_TEST3: " + err.Error())
 	}
+	JSON_TEST4__S := os.Getenv("JSON_TEST4")
+	var JSON_TEST4 JSON_TEST4
+	err = json.Unmarshal([]byte(JSON_TEST4__S), &JSON_TEST4)
+	if err != nil {
+		return errors.New("JSON_TEST4: " + err.Error())
+	}
 	R_BOOL_TEST := false
 	R_BOOL_TEST__S := os.Getenv("R_BOOL_TEST")
 	if R_BOOL_TEST__S == "" {
@@ -1117,6 +1131,7 @@ func Load() error {
 		JSON_TEST:                  JSON_TEST,
 		JSON_TEST2:                 JSON_TEST2,
 		JSON_TEST3:                 JSON_TEST3,
+		JSON_TEST4:                 JSON_TEST4,
 		R_BOOL_TEST:                R_BOOL_TEST,
 		R_FLOAT64_TEST:             R_FLOAT64_TEST,
 		R_FORCE_INT:                R_FORCE_INT,
@@ -1193,6 +1208,7 @@ type getterInterface interface {
 	JSON_TEST() JSON_TEST
 	JSON_TEST2() JSON_TEST2
 	JSON_TEST3() JSON_TEST3
+	JSON_TEST4() JSON_TEST4
 	R_BOOL_TEST() bool
 	R_FLOAT64_TEST() float64
 	R_FORCE_INT() int
@@ -1276,6 +1292,7 @@ type setterInterface interface {
 	JSON_TEST() JSON_TEST
 	JSON_TEST2() JSON_TEST2
 	JSON_TEST3() JSON_TEST3
+	JSON_TEST4() JSON_TEST4
 	R_BOOL_TEST() bool
 	R_FLOAT64_TEST() float64
 	R_FORCE_INT() int

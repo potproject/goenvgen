@@ -136,6 +136,14 @@ func Test_EnvGenTestSet(t *testing.T) {
 	if diff := cmp.Diff(JSON_TEST3_VAR, Get().JSON_TEST3()); diff != "" {
 		t.Errorf("JSON_TEST3 invalid: %s", diff)
 	}
+	JSON_TEST4_VAR := JSON_TEST4{
+		{ID: "100"},
+		{ID: "200"},
+	}
+	Set().JSON_TEST4(JSON_TEST4_VAR)
+	if diff := cmp.Diff(JSON_TEST4_VAR, Get().JSON_TEST4()); diff != "" {
+		t.Errorf("JSON_TEST4 invalid: %s", diff)
+	}
 	Set().Lower_snake_case_test_json(Lower_snake_case_test_json{Ids: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}})
 	if diff := cmp.Diff(Lower_snake_case_test_json{Ids: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}}, Get().Lower_snake_case_test_json()); diff != "" {
 		t.Errorf("lower_snake_case_test_json invalid: %s", diff)
@@ -428,6 +436,12 @@ func Test_EnvGenTestGet(t *testing.T) {
 		ID: 1,
 	}, Get().JSON_TEST3()); diff != "" {
 		t.Errorf("JSON_TEST3 invalid: %s", diff)
+	}
+	if diff := cmp.Diff(JSON_TEST4{
+		{ID: "100"},
+		{ID: "200"},
+	}, Get().JSON_TEST4()); diff != "" {
+		t.Errorf("JSON_TEST4 invalid: %s", diff)
 	}
 	if diff := cmp.Diff(Lower_snake_case_test_json{Ids: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}}, Get().Lower_snake_case_test_json()); diff != "" {
 		t.Errorf("lower_snake_case_test_json invalid: %s", diff)

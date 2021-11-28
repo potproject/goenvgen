@@ -138,6 +138,12 @@ func Test_checker(t *testing.T) {
 			KindWithSliceAndRequired: model.KindWithSliceAndRequired{Kind: model.JSON, Slice: false, Required: false},
 			value:                    map[string]interface{}{"IDs": []interface{}{float64(1), float64(2), string("500"), string("ABC")}},
 		},
+		{
+			name:                     "JSON test4",
+			text:                     `[{"ID": "100"},{"ID": "200"}]`,
+			KindWithSliceAndRequired: model.KindWithSliceAndRequired{Kind: model.JSON, Slice: false, Required: false},
+			value:                    []interface{}{map[string]interface{}{"ID": string("100")}, map[string]interface{}{"ID": string("200")}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
