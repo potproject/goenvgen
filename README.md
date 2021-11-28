@@ -151,7 +151,7 @@ You can make the value required by specifying the `-r` option when generating th
 goenvgen -p envgen -r BASE_HOST,BASE_PORT
 ```
 
-```
+```bash
 $ go run .\main.go
 BASE_HOST is required
 ```
