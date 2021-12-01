@@ -148,6 +148,11 @@ You can make the value required by specifying the `-r` option when generating th
 
 #### Example:
 ```
+BASE_HOST=
+BASE_PORT=8080
+```
+
+```
 goenvgen -p envgen -r BASE_HOST,BASE_PORT
 ```
 
