@@ -29,7 +29,7 @@ USER_JSON={"Alice": {"ID": 100}, "Bob": {"ID": 200}}
 The following code will be generated automatically Go Package.
 
 ```
-$ goenvgen -p envgen .env.
+$ goenvgen -p envgen .env
 Generated envgen Packages.
 
 $ tree envgen
