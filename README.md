@@ -11,6 +11,10 @@ This package eliminates the need to use `os.GetEnv`.
 ### Installation
 
 ```
+# Go >= 1.17:
+$ go install github.com/potproject/goenvgen
+
+# Go < 1.17:
 $ go get github.com/potproject/goenvgen
 ```
 
